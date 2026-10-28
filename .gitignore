@@ -4,6 +4,7 @@ dist/
 .DS_Store
 qa-shots/
 qa-shots-3d/
+docs/
 *.log
 .env
 .env.*

@@ -10,18 +10,6 @@
 
 ---
 
-## 界面一览
-
-<p>
-  <img src="docs/screenshots/home.png" alt="首页 3D 观器与器物部件虚线标注" width="49%">
-  <img src="docs/screenshots/gallery.png" alt="器影长廊实拍图片轮播" width="49%">
-</p>
-
-<p>
-  <img src="docs/screenshots/wheel.png" alt="拉坯页 3D 轮盘" width="49%">
-  <img src="docs/screenshots/memory.png" alt="开窑页游器手札" width="49%">
-</p>
-
 ---
 
 ## 核心体验
@@ -84,10 +72,11 @@
 
 首页首屏放置一个放大的「器影长廊」：
 
-- 五张器影卡片以旋转透视形成 3D 封面流，首屏即可看到轮播与控制；
-- 支持自动轮播、拖动、左右按钮、圆点与方向键；
-- 滚出视口时自动暂停；
-- 当前使用 **图片占位**，后续可直接替换为实拍图或渲染图。
+- 十一张器物影像以旋转透视形成 3D 封面流，首屏即可看到轮播与控制；
+- 自动轮播速度放慢，支持左右按钮、圆点与方向键切换；
+- 左右移动鼠标即可换下一张，不需要点击；
+- 点击卡片可打开大图预览，完整查看图片与器影说明；
+- 滚出视口时自动暂停。
 
 ---
 
@@ -202,7 +191,6 @@ pnpm check
 │  └─ assets/
 │     ├─ hdri/                    # 本地工作室 HDRI
 │     └─ gallery/                 # 器影卡片图与预览大图
-├─ docs/screenshots/              # README 截图
 ├─ scripts/                       # QA 截图与交互脚本
 ├─ 设计文档.md
 ├─ CREDITS.md
