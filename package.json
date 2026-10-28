@@ -1,0 +1,27 @@
+{
+  "name": "ciyun-shuyi",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fontsource-variable/eb-garamond": "^5.3.0",
+    "@fontsource-variable/noto-serif-sc": "^5.3.1",
+    "astro": "^7.4.2",
+    "cookie": "^2.0.1",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/three": "^0.186.0",
+    "playwright-core": "^1.64.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.0"
+  }
+}

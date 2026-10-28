@@ -1,0 +1,458 @@
+---
+import CreateLayout from '../../layouts/CreateLayout.astro';
+
+const materials = [
+  { n: '01', name: '高岭土', en: 'Kaolin', pct: '54', copy: '骨架。耐高温，让器形在火里站住。' },
+  { n: '02', name: '瓷石', en: 'Porcelain stone', pct: '32', copy: '血肉。带来可塑性与温润的釉底。' },
+  { n: '03', name: '水', en: 'Water', pct: '14', copy: '分寸。多一点则软，少一点则倔。' },
+];
+---
+
+<CreateLayout
+  step={1}
+  page="clay"
+  title="取土 · 揉泥"
+  description="第一道工序：高岭土、瓷石与水相遇。揉去气泡，也揉进耐性。"
+>
+  <div class="clay-layout">
+    <section class="clay-copy">
+      <span class="clay-copy__num" aria-hidden="true">壹</span>
+      <p class="eyebrow">第一道 · 取土 <span class="latin">/ Clay</span></p>
+      <h1 class="clay-copy__title">土有脾气，<br />先揉开它。</h1>
+      <p class="lead clay-copy__lead">
+        高岭土给骨架，瓷石给韧性，水给分寸。三者相遇之后，还要经过一双手。
+      </p>
+
+      <div class="clay-materials" aria-label="泥料配比示意">
+        {materials.map((material) => (
+          <div class="clay-material">
+            <span class="clay-material__n latin">{material.n}</span>
+            <span class="clay-material__name">{material.name}<span class="clay-material__en">{material.en}</span></span>
+            <span class="clay-material__pct latin">{material.pct}<span>%</span></span>
+            <span class="clay-material__copy">{material.copy}</span>
+          </div>
+        ))}
+      </div>
+
+      <blockquote class="clay-quote">
+        <p>揉泥不是力气活，<br />是听泥的过程。</p>
+        <cite>拉坯前的十分钟</cite>
+      </blockquote>
+
+      <div class="clay-actions">
+        <a class="btn btn--solid" href="/create/form" data-clay-cta>
+          <span data-clay-cta-label>上轮 · 拉坯</span> <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <p class="clay-note">揉泥为体验交互，可随时跳过。配比为体验示意，非真实工艺配方。</p>
+      </div>
+    </section>
+
+    <section class="clay-stage-wrap" aria-labelledby="clay-stage-title">
+      <div class="clay-stage" data-clay-stage>
+        <div class="clay-stage__head">
+          <span class="micro" id="clay-stage-title">揉泥 · Kneading</span>
+          <span class="clay-stage__count"><span data-clay-count>0</span> / 5</span>
+        </div>
+
+        <div class="clay-stage__canvas-wrap">
+          <span class="clay-stage__ring" aria-hidden="true"></span>
+          <canvas
+            class="clay-canvas"
+            data-clay-canvas
+            role="img"
+            aria-label="一团可以被按压、揉开的陶土"
+          ></canvas>
+          <p class="clay-stage__hint">
+            <span class="clay-stage__hint-dot" aria-hidden="true"></span>
+            按住泥团，向两侧揉开
+          </p>
+        </div>
+
+        <div class="clay-stage__foot">
+          <div class="clay-dots" aria-hidden="true">
+            {[1, 2, 3, 4, 5].map((dot) => <span data-clay-dot={dot}></span>)}
+          </div>
+          <p class="clay-status" data-clay-status aria-live="polite">泥团已就位。</p>
+          <button class="text-link clay-skip" type="button" data-clay-complete>
+            帮我揉匀 <span class="arrow" aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    import '../../scripts/clay';
+  </script>
+</CreateLayout>
+
+<style>
+  .clay-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: clamp(40px, 6vw, 100px);
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    align-items: stretch;
+    min-height: calc(100svh - var(--nav-h) - var(--rail-h));
+  }
+
+  .clay-copy {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: clamp(36px, 5.5vh, 70px);
+  }
+
+  .clay-copy__num {
+    position: absolute;
+    top: 4%;
+    right: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(7rem, 12vw, 12rem);
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(27, 24, 19, 0.08);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .clay-copy__title {
+    margin-top: 22px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 4.2vw, 4.3rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+  }
+
+  .clay-copy__lead {
+    margin-top: 26px;
+    max-width: 35ch;
+  }
+
+  .clay-materials {
+    margin-top: clamp(34px, 5vh, 52px);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .clay-material {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 0.85fr) 58px minmax(0, 1.25fr);
+    align-items: baseline;
+    gap: 10px 16px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+
+  .clay-material__n {
+    font-size: 0.76rem;
+    color: var(--text-faint);
+  }
+
+  .clay-material__name {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    letter-spacing: 0.03em;
+  }
+
+  .clay-material__en {
+    font-family: var(--font-latin);
+    font-size: 0.7rem;
+    letter-spacing: 0.09em;
+    color: var(--text-faint);
+  }
+
+  .clay-material__pct {
+    font-family: var(--font-latin);
+    font-size: 1.2rem;
+    color: var(--text-soft);
+    text-align: right;
+  }
+
+  .clay-material__pct span {
+    font-size: 0.7em;
+    color: var(--text-faint);
+  }
+
+  .clay-material__copy {
+    font-size: 0.8rem;
+    line-height: 1.75;
+    color: var(--text-faint);
+  }
+
+  .clay-quote {
+    margin-top: clamp(34px, 5vh, 56px);
+    padding-left: 20px;
+    border-left: 1px solid var(--celadon);
+  }
+
+  .clay-quote p {
+    font-family: var(--font-serif);
+    font-size: clamp(1.15rem, 1.7vw, 1.45rem);
+    line-height: 1.8;
+    letter-spacing: 0.05em;
+  }
+
+  .clay-quote cite {
+    display: block;
+    margin-top: 10px;
+    font-family: var(--font-sans);
+    font-size: var(--text-micro);
+    font-style: normal;
+    letter-spacing: 0.18em;
+    color: var(--text-faint);
+  }
+
+  .clay-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px 26px;
+    margin-top: clamp(38px, 6vh, 58px);
+  }
+
+  .clay-note {
+    max-width: 25ch;
+    font-size: var(--text-xs);
+    line-height: 1.75;
+    color: var(--text-faint);
+  }
+
+  .clay-stage-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: clamp(20px, 3.5vh, 44px);
+  }
+
+  .clay-stage {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 580px;
+    border: 1px solid var(--hairline);
+    background:
+      radial-gradient(circle at 50% 38%, rgba(250, 246, 238, 0.92) 0%, rgba(233, 225, 211, 0.62) 58%, rgba(228, 218, 201, 0.5) 100%);
+    padding: clamp(18px, 2.6vw, 30px);
+  }
+
+  .clay-stage__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .clay-stage__head .micro {
+    color: var(--text-soft);
+  }
+
+  .clay-stage__count {
+    font-family: var(--font-latin);
+    font-size: 0.82rem;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+  }
+
+  .clay-stage__canvas-wrap {
+    position: relative;
+    aspect-ratio: 1 / 0.8;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .clay-stage__canvas-wrap::before {
+    content: '';
+    position: absolute;
+    width: 56%;
+    aspect-ratio: 1.2;
+    border-radius: 48% 52% 55% 45% / 58% 55% 45% 42%;
+    background:
+      radial-gradient(ellipse at 34% 28%, #d8ad84 0%, #bd8d64 35%, #966542 72%, #774c32 100%);
+    box-shadow:
+      0 18px 34px rgba(82, 52, 32, 0.18),
+      inset -10px -14px 28px rgba(86, 52, 31, 0.18);
+    opacity: 1;
+    transition: opacity var(--dur-3) var(--ease);
+  }
+
+  .clay-stage__canvas-wrap.is-ready::before {
+    opacity: 0;
+  }
+
+  .clay-stage__canvas-wrap:active {
+    cursor: grabbing;
+  }
+
+  .clay-stage__ring {
+    position: absolute;
+    width: 76%;
+    aspect-ratio: 1;
+    border: 1px solid var(--hairline-soft);
+    border-radius: 50%;
+  }
+
+  .clay-stage__ring::after {
+    content: '';
+    position: absolute;
+    inset: 9%;
+    border: 1px dashed rgba(27, 24, 19, 0.06);
+    border-radius: 50%;
+  }
+
+  .clay-canvas {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity var(--dur-3) var(--ease);
+  }
+
+  .clay-canvas.is-ready {
+    opacity: 1;
+  }
+
+  .btn.is-ready {
+    border-color: var(--celadon-deep);
+  }
+
+  .text-link[disabled] {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .clay-stage__hint {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: var(--text-micro);
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+  }
+
+  .clay-stage__hint-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--kiln);
+    animation: soft-pulse 2.6s ease-in-out infinite;
+  }
+
+  .clay-stage__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 42px;
+    padding-top: 14px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .clay-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .clay-dots span {
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--hairline);
+    border-radius: 50%;
+    transition:
+      background-color var(--dur-2) var(--ease),
+      border-color var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease);
+  }
+
+  .clay-dots span.is-filled {
+    background: var(--kiln);
+    border-color: var(--kiln);
+    transform: scale(1.15);
+  }
+
+  .clay-status {
+    flex: 1;
+    font-size: var(--text-xs);
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .clay-skip {
+    flex: 0 0 auto;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+  }
+
+  .clay-stage[data-ready='true'] .clay-status {
+    color: var(--celadon-deep);
+  }
+
+  @media (max-width: 980px) {
+    .clay-layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .clay-copy {
+      padding-block: clamp(40px, 7vh, 72px) 22px;
+    }
+
+    .clay-copy__num {
+      font-size: 7rem;
+      top: 2%;
+    }
+
+    .clay-stage-wrap {
+      padding-bottom: 48px;
+    }
+
+    .clay-stage {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .clay-material {
+      grid-template-columns: 28px minmax(0, 1fr) 48px;
+    }
+
+    .clay-material__copy {
+      grid-column: 2 / 4;
+    }
+
+    .clay-stage__foot {
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    .clay-status {
+      order: 3;
+      flex-basis: 100%;
+      text-align: left;
+    }
+
+    .clay-skip {
+      margin-left: auto;
+    }
+  }
+</style>

@@ -1,0 +1,580 @@
+---
+import CreateLayout from '../../layouts/CreateLayout.astro';
+import VesselPoster from '../../components/VesselPoster.astro';
+
+const presets = [
+  { id: 'meiping', name: '梅瓶', note: '丰肩，修长' },
+  { id: 'yuhuchun', name: '玉壶春', note: '撇口，垂腹' },
+  { id: 'jar', name: '罐', note: '圆肩，饱满' },
+];
+---
+
+<CreateLayout
+  step={2}
+  page="form"
+  title="拉坯 · 成形"
+  description="第二道工序：在轮盘上拖动器身，塑出属于你的轮廓。"
+>
+  <div class="wheel-page">
+    <section class="wheel-stage" data-wheel-stage data-mode="form" aria-label="拉坯工作台">
+      <div class="wheel-stage__meta">
+        <span class="wheel-stage__meta-left">
+          <span class="status-dot" aria-hidden="true"></span>
+          轮盘 · 泥性良好
+        </span>
+        <span class="wheel-stage__meta-right">
+          <span>自动旋转</span>
+          <span class="micro">12 RPM</span>
+        </span>
+      </div>
+
+      <div class="wheel-stage__halo" aria-hidden="true"></div>
+      <div class="wheel-stage__guide" aria-hidden="true"></div>
+      <div class="wheel-stage__wheel" aria-hidden="true"></div>
+
+      <div class="wheel-stage__vessel">
+        <VesselPoster tone="celadon" label="轮盘上的一只待塑形陶坯" />
+        <div class="wheel-canvas" data-wheel-canvas aria-hidden="true"></div>
+      </div>
+
+      <div class="wheel-stage__hint">
+        <span class="wheel-stage__hint-icon" aria-hidden="true">↔</span>
+        <span>左右拖动 · 塑出轮廓</span>
+      </div>
+
+      <div class="wheel-toolbar" role="toolbar" aria-label="拉坯工具">
+        <button class="wheel-tool" type="button" data-wheel-tool="shape" aria-pressed="true">
+          塑形
+        </button>
+        <button class="wheel-tool" type="button" data-wheel-tool="rotate" aria-pressed="false">
+          旋转
+        </button>
+        <span class="wheel-toolbar__divider" aria-hidden="true"></span>
+        <button class="wheel-tool" type="button" data-wheel-action="smooth">
+          修坯
+        </button>
+        <button class="wheel-tool" type="button" data-wheel-action="undo">
+          撤销 <span class="wheel-tool__key" aria-hidden="true">Z</span>
+        </button>
+        <button class="wheel-tool" type="button" data-wheel-action="reset">
+          重置
+        </button>
+      </div>
+
+      <div class="wheel-stage__zoom micro">滚轮 / 双指 · 缩放</div>
+    </section>
+
+    <aside class="wheel-panel">
+      <div class="wheel-panel__head">
+        <p class="eyebrow">第二道 · 成形 <span class="latin">/ Form</span></p>
+        <h1 class="wheel-panel__title">轮转，<br />手起，<br />器成。</h1>
+        <p class="wheel-panel__lead">
+          泥在轮上找到重心，手只负责把多余的去掉。左右拖动器身，轮廓会跟着你走。
+        </p>
+      </div>
+
+      <div class="wheel-panel__section">
+        <div class="wheel-panel__label">
+          <span class="micro">器型起点 · Preset</span>
+          <span class="wheel-panel__value" data-preset-label>梅瓶</span>
+        </div>
+        <div class="preset-list" data-preset-list>
+          {presets.map((preset, index) => (
+            <button
+              class:list={['preset', { 'is-active': index === 0 }]}
+              type="button"
+              data-preset={preset.id}
+              aria-pressed={index === 0 ? 'true' : 'false'}
+            >
+              <span>{preset.name}</span>
+              <span class="preset__note">{preset.note}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p class="wheel-panel__mini">左右拖动塑形 · 切换旋转查看 · 滚轮缩放 · 可随时撤销</p>
+
+      <div class="wheel-panel__status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>器型 · 示例梅瓶</span>
+        <span class="wheel-panel__status-note">尚未修改</span>
+      </div>
+
+      <div class="wheel-panel__actions">
+        <a class="btn btn--solid btn--block" href="/create/craft">
+          完成，择釉 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="text-link" href="/create/craft">使用示例器型，直接往下 <span class="arrow" aria-hidden="true">→</span></a>
+      </div>
+    </aside>
+  </div>
+</CreateLayout>
+
+<style>
+  .wheel-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1.58fr) minmax(320px, 0.42fr);
+    height: calc(100svh - var(--nav-h) - var(--rail-h));
+    min-height: 620px;
+  }
+
+  .wheel-stage {
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid var(--hairline);
+    background:
+      radial-gradient(ellipse at 50% 38%, #faf6ee 0%, #efe7d9 56%, #e4d8c6 100%);
+    isolation: isolate;
+  }
+
+  .wheel-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.28;
+    background-image:
+      linear-gradient(rgba(27, 24, 19, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(27, 24, 19, 0.05) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: radial-gradient(ellipse at 50% 48%, black 20%, transparent 76%);
+  }
+
+  .wheel-stage__meta {
+    position: absolute;
+    top: 22px;
+    right: 28px;
+    left: 28px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    font-size: var(--text-micro);
+    letter-spacing: 0.14em;
+    color: var(--text-faint);
+  }
+
+  .wheel-stage__meta-left,
+  .wheel-stage__meta-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .wheel-stage__meta-right {
+    text-align: right;
+  }
+
+  .status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--celadon-deep);
+    box-shadow: 0 0 0 3px rgba(124, 154, 139, 0.14);
+  }
+
+  .wheel-stage__halo {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    width: min(64vw, 560px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 54%, transparent 72%);
+    pointer-events: none;
+  }
+
+  .wheel-stage__guide {
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    width: min(48vw, 440px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border: 1px dashed rgba(27, 24, 19, 0.13);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .wheel-stage__guide::before,
+  .wheel-stage__guide::after {
+    content: '';
+    position: absolute;
+    background: rgba(27, 24, 19, 0.12);
+  }
+
+  .wheel-stage__guide::before {
+    top: -1px;
+    bottom: -1px;
+    left: 50%;
+    width: 1px;
+  }
+
+  .wheel-stage__guide::after {
+    top: 50%;
+    right: -1px;
+    left: -1px;
+    height: 1px;
+  }
+
+  .wheel-stage__wheel {
+    position: absolute;
+    bottom: 8.5%;
+    left: 50%;
+    width: min(40%, 380px);
+    height: 9%;
+    min-height: 44px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse at 50% 38%, #d8c8b2 0%, #c3ad92 48%, #9d846a 100%);
+    box-shadow:
+      0 22px 34px rgba(78, 56, 35, 0.18),
+      inset 0 2px 2px rgba(255, 255, 255, 0.42),
+      inset 0 -4px 12px rgba(74, 51, 30, 0.16);
+  }
+
+  .wheel-stage__wheel::before {
+    content: '';
+    position: absolute;
+    inset: 12% 18%;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 250, 240, 0.28);
+    background: radial-gradient(ellipse at 50% 30%, rgba(255, 253, 247, 0.3), transparent 62%);
+  }
+
+  .wheel-stage__wheel::after {
+    content: '';
+    position: absolute;
+    inset: 30% 38%;
+    border-radius: 50%;
+    background: rgba(72, 51, 32, 0.14);
+    filter: blur(3px);
+  }
+
+  .wheel-stage__vessel {
+    position: absolute;
+    top: 7.5%;
+    bottom: 17%;
+    left: 50%;
+    width: min(54%, 520px);
+    transform: translateX(-50%);
+    display: grid;
+    place-items: center;
+  }
+
+  .wheel-stage__vessel :global(.vessel-poster) {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+  }
+
+  .wheel-stage__vessel :global(.vessel-poster__svg) {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+
+  .wheel-canvas {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.9s var(--ease);
+  }
+
+  .wheel-stage__hint {
+    position: absolute;
+    bottom: 30px;
+    left: 28px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    white-space: nowrap;
+    font-size: var(--text-micro);
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+  }
+
+  .wheel-stage__hint-icon {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 16px;
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    font-size: 0.7rem;
+    color: var(--text-soft);
+  }
+
+  .wheel-toolbar {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    z-index: 4;
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    padding: 4px;
+    transform: translateX(-50%);
+    background: color-mix(in srgb, var(--paper-light) 84%, transparent);
+    border: 1px solid var(--hairline);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 30px rgba(62, 45, 28, 0.08);
+  }
+
+  .wheel-tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 58px;
+    height: 38px;
+    padding: 0 12px;
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    color: var(--text-soft);
+    transition:
+      background-color var(--dur-1) var(--ease),
+      color var(--dur-1) var(--ease);
+  }
+
+  .wheel-tool:hover {
+    color: var(--text);
+    background: rgba(27, 24, 19, 0.04);
+  }
+
+  .wheel-tool[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .wheel-tool__key {
+    font-family: var(--font-latin);
+    font-size: 0.64rem;
+    opacity: 0.5;
+  }
+
+  .wheel-toolbar__divider {
+    width: 1px;
+    margin: 7px 3px;
+    background: var(--hairline);
+  }
+
+  .wheel-stage__zoom {
+    position: absolute;
+    right: 28px;
+    bottom: 30px;
+    z-index: 3;
+    color: var(--text-faint);
+    letter-spacing: 0.14em;
+  }
+
+  .wheel-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    padding: clamp(24px, 2.8vw, 38px);
+    background: var(--surface);
+  }
+
+  .wheel-panel__title {
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(1.9rem, 2.35vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+  }
+
+  .wheel-panel__lead {
+    margin-top: 18px;
+    font-size: var(--text-sm);
+    line-height: 1.95;
+    color: var(--text-soft);
+  }
+
+  .wheel-panel__section {
+    padding-top: 18px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .wheel-panel__mini {
+    padding-top: 14px;
+    border-top: 1px solid var(--hairline);
+    font-size: var(--text-xs);
+    line-height: 1.8;
+    color: var(--text-faint);
+  }
+
+  .wheel-panel__label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .wheel-panel__value {
+    font-family: var(--font-serif);
+    font-size: 0.86rem;
+    color: var(--text-soft);
+  }
+
+  .preset-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .preset {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 8px 12px;
+    border: 1px solid var(--hairline);
+    text-align: left;
+    transition:
+      border-color var(--dur-1) var(--ease),
+      background-color var(--dur-1) var(--ease),
+      color var(--dur-1) var(--ease);
+  }
+
+  .preset span:first-child {
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+  }
+
+  .preset__note {
+    font-size: 0.64rem;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+  }
+
+  .preset:hover {
+    border-color: rgba(27, 24, 19, 0.3);
+  }
+
+  .preset.is-active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+
+  .preset.is-active .preset__note {
+    color: rgba(243, 238, 228, 0.6);
+  }
+
+  .wheel-tips {
+    display: grid;
+    gap: 9px;
+    margin-top: 12px;
+  }
+
+  .wheel-tips li {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 4px;
+    font-size: var(--text-xs);
+    line-height: 1.8;
+    color: var(--text-faint);
+  }
+
+  .wheel-tips .latin {
+    color: var(--text-soft);
+    font-size: 0.72rem;
+  }
+
+  .wheel-panel__status {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+    font-size: var(--text-xs);
+    color: var(--text-soft);
+  }
+
+  .wheel-panel__status-note {
+    margin-left: auto;
+    color: var(--text-faint);
+  }
+
+  .wheel-panel__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 24px;
+  }
+
+  @media (max-width: 1080px) {
+    .wheel-page {
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+    }
+
+    .wheel-stage__zoom {
+      display: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .wheel-page {
+      grid-template-columns: minmax(0, 1fr);
+      height: auto;
+      min-height: 0;
+    }
+
+    .wheel-stage {
+      height: min(66svh, 620px);
+      min-height: 430px;
+      border-right: 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .wheel-stage__vessel {
+      top: 8%;
+      bottom: 20%;
+      width: min(58%, 340px);
+    }
+
+    .wheel-stage__wheel {
+      width: 58%;
+      bottom: 10%;
+    }
+
+    .wheel-stage__hint {
+      bottom: 64px;
+      left: 16px;
+    }
+
+    .wheel-toolbar {
+      bottom: 14px;
+      max-width: calc(100% - 24px);
+      overflow-x: auto;
+    }
+
+    .wheel-tool {
+      min-width: 52px;
+      padding: 0 10px;
+      font-size: 0.7rem;
+    }
+
+    .wheel-panel {
+      padding: 30px var(--gutter) 44px;
+      gap: 24px;
+      overflow: visible;
+    }
+
+    .wheel-panel__title {
+      font-size: clamp(2rem, 7vw, 2.7rem);
+    }
+  }
+</style>

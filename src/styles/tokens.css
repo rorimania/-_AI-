@@ -1,0 +1,149 @@
+/* ------------------------------------------------------------------
+   Ciyun Shuyi — design tokens
+   Paper / ink / celadon / kiln. One accent at a time.
+------------------------------------------------------------------- */
+
+@import '@fontsource-variable/noto-serif-sc/wght.css';
+@import '@fontsource-variable/eb-garamond/wght.css';
+
+:root {
+  /* raw palette */
+  --paper: #f3eee4;
+  --paper-deep: #e9e1d3;
+  --paper-light: #faf6ee;
+  --ink: #1b1813;
+  --ink-soft: #4a443b;
+  --ink-faint: #7c7365;
+  --celadon: #7c9a8b;
+  --celadon-deep: #4f6f63;
+  --celadon-pale: #dbe4dc;
+  --kiln: #b8613a;
+  --kiln-bright: #e27643;
+  --gold: #a98b5f;
+  --night: #141210;
+  --night-soft: #1e1a16;
+  --night-ink: #e8d9c5;
+  --night-faint: #a99a84;
+
+  /* semantic — light by default */
+  --surface: var(--paper);
+  --surface-raised: var(--paper-light);
+  --text: var(--ink);
+  --text-soft: var(--ink-soft);
+  --text-faint: var(--ink-faint);
+  --hairline: rgba(27, 24, 19, 0.14);
+  --hairline-soft: rgba(27, 24, 19, 0.075);
+  --accent: var(--celadon-deep);
+  --accent-soft: var(--celadon-pale);
+  --selection: rgba(124, 154, 139, 0.34);
+  --scrim: rgba(243, 238, 228, 0.82);
+
+  /* type */
+  --font-serif: 'Noto Serif SC Variable', 'Songti SC', 'STSong', 'SimSun', serif;
+  --font-sans: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+  --font-latin: 'EB Garamond Variable', 'Times New Roman', serif;
+
+  --text-display: clamp(3.15rem, 5.7vw, 6.1rem);
+  --text-h1: clamp(2.5rem, 4.3vw, 4.4rem);
+  --text-h2: clamp(1.9rem, 3vw, 3rem);
+  --text-h3: clamp(1.28rem, 1.65vw, 1.65rem);
+  --text-lead: clamp(1.02rem, 1.15vw, 1.16rem);
+  --text-body: 1rem;
+  --text-sm: 0.875rem;
+  --text-xs: 0.75rem;
+  --text-micro: 0.6875rem;
+
+  /* rhythm */
+  --nav-h: 78px;
+  --rail-h: 56px;
+  --gutter: clamp(20px, 4.2vw, 64px);
+  --page-max: 1440px;
+  --section-y: clamp(88px, 13vh, 168px);
+  --measure: 62ch;
+
+  /* motion */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 200ms;
+  --dur-2: 450ms;
+  --dur-3: 800ms;
+
+  /* layering */
+  --z-nav: 50;
+  --z-rail: 40;
+  --z-grain: 90;
+  --z-toast: 120;
+}
+
+.theme-night {
+  --surface: var(--night);
+  --surface-raised: var(--night-soft);
+  --text: var(--night-ink);
+  --text-soft: #c3b49e;
+  --text-faint: var(--night-faint);
+  --hairline: rgba(232, 217, 197, 0.16);
+  --hairline-soft: rgba(232, 217, 197, 0.08);
+  --accent: var(--kiln-bright);
+  --accent-soft: rgba(226, 118, 67, 0.14);
+  --selection: rgba(226, 118, 67, 0.32);
+  --scrim: rgba(20, 18, 16, 0.72);
+  color-scheme: dark;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes line-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}

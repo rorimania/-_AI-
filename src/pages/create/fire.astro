@@ -1,0 +1,561 @@
+---
+import CreateLayout from '../../layouts/CreateLayout.astro';
+import VesselPoster from '../../components/VesselPoster.astro';
+import { defaultCraft } from '../../data/crafts';
+
+const embers = Array.from({ length: 18 }, (_, index) => ({
+  left: 18 + ((index * 37) % 64),
+  delay: (index * 0.47) % 4.2,
+  duration: 3.4 + (index % 5) * 0.72,
+  size: 1 + (index % 3),
+  drift: (index % 2 === 0 ? 1 : -1) * (6 + (index % 4) * 4),
+}));
+
+const phases = [
+  { n: '01', name: '装窑', time: '0:00', state: 'done' },
+  { n: '02', name: '升温', time: '6:00', state: 'done' },
+  { n: '03', name: '保温', time: '9:00', state: 'current' },
+  { n: '04', name: '冷却', time: '11:30', state: 'todo' },
+  { n: '05', name: '开窑', time: '—', state: 'todo' },
+];
+---
+
+<CreateLayout
+  step={4}
+  page="fire"
+  theme="night"
+  title="入窑 · 烧制"
+  description="第四道工序：温度、气氛与时间共同决定釉色。把答案交给火。"
+>
+  <div class="fire-page">
+    <section class="fire-stage" data-kiln-stage aria-label="窑室烧制模拟">
+      <div class="fire-stage__ambient" aria-hidden="true"></div>
+
+      <div class="fire-kiln">
+        <div class="fire-kiln__ring" aria-hidden="true"></div>
+        <div class="fire-kiln__glow" aria-hidden="true"></div>
+        <div class="fire-kiln__embers" aria-hidden="true">
+          {embers.map((ember) => (
+            <span
+              style={`--left:${ember.left}%;--delay:${ember.delay}s;--dur:${ember.duration}s;--size:${ember.size}px;--drift:${ember.drift}px;`}
+            ></span>
+          ))}
+        </div>
+        <div class="fire-kiln__vessel">
+          <VesselPoster tone={defaultCraft.tone} label="窑火中的瓷瓶" />
+        </div>
+      </div>
+
+      <div class="fire-temp">
+        <p class="micro">窑温 · Kiln temperature</p>
+        <p class="fire-temp__value">
+          <span class="latin" data-kiln-temp>1320</span><span class="fire-temp__unit">°C</span>
+        </p>
+        <p class="fire-temp__meta">
+          <span class="status-dot status-dot--kiln" aria-hidden="true"></span>
+          保温中 · {defaultCraft.atmosphere}
+        </p>
+      </div>
+
+      <div class="fire-timeline" aria-label="烧成进度">
+        <div class="fire-timeline__head">
+          <span class="micro">烧成进程 · Firing</span>
+          <span class="latin" data-fire-progress>68%</span>
+        </div>
+        <div class="fire-timeline__bar"><span style="width: 68%"></span></div>
+        <div class="fire-timeline__phases">
+          <span>装窑</span><span>升温</span><span class="is-current">保温</span><span>冷却</span><span>开窑</span>
+        </div>
+      </div>
+
+      <p class="fire-stage__note">温度与釉色变化为数字模拟。</p>
+    </section>
+
+    <aside class="fire-panel">
+      <div class="fire-panel__head">
+        <p class="eyebrow">第四道 · 烧制 <span class="latin">/ Fire</span></p>
+        <h1 class="fire-panel__title">入窑，<br />把答案<br />交给火。</h1>
+        <p class="fire-panel__lead">
+          温度、气氛与时间，共同决定釉色。你能做的，是选对火候，然后等待。
+        </p>
+      </div>
+
+      <div class="fire-panel__section">
+        <p class="micro">烧成阶段 · Phases</p>
+        <ol class="kiln-phases">
+          {phases.map((phase) => (
+            <li class:list={[`is-${phase.state}`]}>
+              <span class="kiln-phases__num latin">{phase.n}</span>
+              <span class="kiln-phases__name">{phase.name}</span>
+              <span class="kiln-phases__time latin">{phase.time}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div class="fire-panel__section">
+        <p class="micro">本窑 · This firing</p>
+        <div class="fire-summary">
+          <span class="fire-summary__swatch" style={`--swatch: ${defaultCraft.swatch};`} aria-hidden="true"></span>
+          <div>
+            <p class="fire-summary__name">{defaultCraft.name} · {defaultCraft.subtitle}</p>
+            <p class="fire-summary__meta">{defaultCraft.tempLabel} · {defaultCraft.atmosphere} · {defaultCraft.character}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fire-panel__actions">
+        <a class="btn btn--solid btn--block" href="/create/result">
+          开窑，见器 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="text-link fire-skip" href="/create/result">跳过烧制 <span class="arrow" aria-hidden="true">→</span></a>
+        <p class="fire-panel__note">烧制约需 12 秒。跳过不会影响成品。</p>
+      </div>
+    </aside>
+  </div>
+</CreateLayout>
+
+<style>
+  .fire-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(330px, 380px);
+    min-height: calc(100svh - var(--nav-h) - var(--rail-h));
+    background: var(--night);
+    color: var(--night-ink);
+  }
+
+  .fire-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 620px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 45%, #241a12 0%, #16120e 46%, #0d0b09 100%);
+    isolation: isolate;
+  }
+
+  .fire-stage__ambient {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(circle at 50% 54%, rgba(226, 118, 67, 0.1) 0%, transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(226, 118, 67, 0.12) 0%, transparent 50%);
+  }
+
+  .fire-stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(8, 7, 6, 0.55) 100%);
+  }
+
+  .fire-kiln {
+    position: relative;
+    z-index: 2;
+    width: min(58vmin, 540px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    margin-top: 2vh;
+  }
+
+  .fire-kiln__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(226, 118, 67, 0.28);
+    box-shadow:
+      inset 0 0 90px rgba(226, 118, 67, 0.09),
+      0 0 100px rgba(226, 118, 67, 0.05);
+  }
+
+  .fire-kiln__ring::before {
+    content: '';
+    position: absolute;
+    inset: 7%;
+    border-radius: 50%;
+    border: 1px dashed rgba(232, 217, 197, 0.12);
+  }
+
+  .fire-kiln__ring::after {
+    content: '';
+    position: absolute;
+    inset: 16%;
+    border-radius: 50%;
+    border: 1px solid rgba(232, 217, 197, 0.06);
+  }
+
+  .fire-kiln__glow {
+    position: absolute;
+    inset: 12%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 50% 58%,
+      rgba(226, 118, 67, 0.18) 0%,
+      rgba(226, 118, 67, 0.05) 46%,
+      transparent 70%
+    );
+    filter: blur(10px);
+  }
+
+  .fire-kiln__vessel {
+    position: relative;
+    z-index: 2;
+    width: 47%;
+    filter: drop-shadow(0 0 36px rgba(226, 118, 67, 0.24));
+  }
+
+  .fire-kiln__vessel :global(.poster-halo),
+  .fire-kiln__vessel :global(.poster-shadow) {
+    display: none;
+  }
+
+  .fire-kiln__vessel :global(.vessel-poster__svg) {
+    filter: sepia(0.12) saturate(0.96) brightness(0.98);
+  }
+
+  .fire-kiln__embers {
+    position: absolute;
+    inset: 7%;
+    z-index: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .fire-kiln__embers span {
+    position: absolute;
+    bottom: 8%;
+    left: var(--left);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: var(--kiln-bright);
+    box-shadow: 0 0 6px rgba(226, 118, 67, 0.7);
+    opacity: 0;
+    animation: ember-rise var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes ember-rise {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale(0.8);
+    }
+    18% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--drift), -260px, 0) scale(0.2);
+    }
+  }
+
+  .fire-temp {
+    position: absolute;
+    top: clamp(28px, 5vh, 56px);
+    left: clamp(26px, 4vw, 56px);
+    z-index: 3;
+  }
+
+  .fire-temp .micro {
+    color: var(--night-faint);
+  }
+
+  .fire-temp__value {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 10px;
+    color: var(--night-ink);
+    font-size: clamp(3.6rem, 7.4vw, 7rem);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+  }
+
+  .fire-temp__unit {
+    margin-top: 0.35em;
+    font-family: var(--font-latin);
+    font-size: 0.24em;
+    letter-spacing: 0.05em;
+    color: var(--night-faint);
+  }
+
+  .fire-temp__meta {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 16px;
+    font-size: var(--text-micro);
+    letter-spacing: 0.15em;
+    color: var(--night-faint);
+  }
+
+  .status-dot--kiln {
+    background: var(--kiln-bright);
+    box-shadow: 0 0 0 3px rgba(226, 118, 67, 0.15);
+  }
+
+  .fire-timeline {
+    position: absolute;
+    bottom: clamp(26px, 4.5vh, 52px);
+    left: clamp(26px, 4vw, 56px);
+    z-index: 3;
+    width: min(34%, 380px);
+    min-width: 250px;
+  }
+
+  .fire-timeline__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .fire-timeline__head .micro {
+    color: var(--night-faint);
+  }
+
+  .fire-timeline__head .latin {
+    font-size: 0.8rem;
+    color: var(--night-ink);
+  }
+
+  .fire-timeline__bar {
+    height: 1px;
+    background: rgba(232, 217, 197, 0.14);
+  }
+
+  .fire-timeline__bar span {
+    display: block;
+    height: 100%;
+    background: var(--kiln-bright);
+    box-shadow: 0 0 10px rgba(226, 118, 67, 0.5);
+  }
+
+  .fire-timeline__phases {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: rgba(232, 217, 197, 0.32);
+  }
+
+  .fire-timeline__phases .is-current {
+    color: var(--kiln-bright);
+  }
+
+  .fire-stage__note {
+    position: absolute;
+    right: clamp(26px, 4vw, 56px);
+    bottom: clamp(30px, 5vh, 56px);
+    z-index: 3;
+    font-size: var(--text-micro);
+    letter-spacing: 0.12em;
+    color: rgba(232, 217, 197, 0.28);
+  }
+
+  .fire-panel {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(16px, 2vh, 22px);
+    overflow-y: auto;
+    padding: clamp(22px, 2.6vw, 34px);
+    border-left: 1px solid rgba(232, 217, 197, 0.1);
+    background: #16120f;
+  }
+
+  .fire-panel__title {
+    margin-top: 16px;
+    font-family: var(--font-serif);
+    font-size: clamp(1.9rem, 2.25vw, 2.4rem);
+    font-weight: 500;
+    line-height: 1.26;
+    letter-spacing: 0.03em;
+    color: var(--night-ink);
+  }
+
+  .fire-panel__lead {
+    margin-top: 14px;
+    font-size: var(--text-sm);
+    line-height: 1.9;
+    color: rgba(232, 217, 197, 0.6);
+  }
+
+  .fire-panel__section {
+    padding-top: 16px;
+    border-top: 1px solid rgba(232, 217, 197, 0.1);
+  }
+
+  .fire-panel__section > .micro {
+    color: var(--night-faint);
+    margin-bottom: 12px;
+  }
+
+  .kiln-phases {
+    display: grid;
+  }
+
+  .kiln-phases li {
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(232, 217, 197, 0.06);
+    font-size: 0.82rem;
+    color: rgba(232, 217, 197, 0.34);
+    transition: color var(--dur-2) var(--ease);
+  }
+
+  .kiln-phases__num {
+    font-size: 0.68rem;
+    opacity: 0.6;
+  }
+
+  .kiln-phases__time {
+    font-size: 0.72rem;
+    opacity: 0.6;
+  }
+
+  .kiln-phases li.is-done {
+    color: rgba(232, 217, 197, 0.52);
+  }
+
+  .kiln-phases li.is-current {
+    color: var(--night-ink);
+  }
+
+  .kiln-phases li.is-current .kiln-phases__name::after {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-left: 8px;
+    border-radius: 50%;
+    background: var(--kiln-bright);
+    vertical-align: middle;
+    animation: soft-pulse 2s ease-in-out infinite;
+  }
+
+  .fire-summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .fire-summary__swatch {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 50%;
+    background: var(--swatch, #888);
+    box-shadow:
+      inset -4px -6px 12px rgba(0, 0, 0, 0.28),
+      inset 3px 3px 10px rgba(255, 255, 255, 0.22);
+  }
+
+  .fire-summary__name {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    color: var(--night-ink);
+  }
+
+  .fire-summary__meta {
+    margin-top: 3px;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    color: var(--night-faint);
+  }
+
+  .fire-panel__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid rgba(232, 217, 197, 0.1);
+  }
+
+  .fire-panel__actions .btn {
+    border-color: rgba(232, 217, 197, 0.7);
+  }
+
+  .fire-skip {
+    color: rgba(232, 217, 197, 0.6);
+  }
+
+  .fire-panel__note {
+    font-size: var(--text-micro);
+    line-height: 1.7;
+    color: var(--night-faint);
+  }
+
+  @media (max-width: 1000px) {
+    .fire-page {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fire-stage {
+      min-height: min(70svh, 640px);
+      height: 70svh;
+    }
+
+    .fire-panel {
+      border-left: 0;
+      border-top: 1px solid rgba(232, 217, 197, 0.1);
+      overflow: visible;
+    }
+
+    .fire-timeline {
+      width: 46%;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .fire-stage {
+      min-height: 520px;
+      height: 64svh;
+    }
+
+    .fire-kiln {
+      width: min(82vmin, 360px);
+      margin-top: 8vh;
+    }
+
+    .fire-temp__value {
+      font-size: clamp(3rem, 15vw, 4.6rem);
+    }
+
+    .fire-timeline {
+      right: 24px;
+      bottom: 24px;
+      left: 24px;
+      width: auto;
+      min-width: 0;
+    }
+
+    .fire-stage__note {
+      display: none;
+    }
+
+    .fire-panel {
+      padding: 30px var(--gutter) 44px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fire-kiln__embers span {
+      display: none;
+    }
+  }
+</style>

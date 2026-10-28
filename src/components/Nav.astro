@@ -1,0 +1,78 @@
+---
+import { navLinks, steps } from '../data/site';
+
+const path = Astro.url.pathname;
+const isHome = path === '/' || path === '/index.html';
+const isCreate = path.startsWith('/create');
+
+const activeFor = (match: string) => {
+  if (match === 'home') return isHome;
+  if (match === 'create') return isCreate;
+  return false;
+};
+
+const menuGroups = [
+  { label: '行旅', links: [{ label: '识器', sub: 'INDEX', href: '/' }, { label: '工序', sub: 'PROCESS', href: '/#process' }, { label: '馆藏', sub: 'COLLECTION', href: '/#collection' }] },
+  { label: '制器', links: steps.map((step) => ({ label: step.name, sub: `0${step.n}`, href: step.href })) },
+  { label: '更多', links: [{ label: '素材鸣谢', sub: 'CREDITS', href: '/credits' }] },
+];
+---
+
+<header class="site-nav" data-site-nav transition:persist>
+  <div class="site-nav__inner">
+    <a class="brand" href="/" aria-label="瓷韵数绎 · 返回首页">
+      <span class="seal seal--sm" aria-hidden="true">瓷</span>
+      <span class="brand__word">瓷韵数绎</span>
+      <span class="brand__sub" aria-hidden="true">CIYUN SHUYI</span>
+    </a>
+
+    <nav class="site-nav__links" aria-label="主导航">
+      {navLinks.map((link) => (
+        <a
+          class:list={['nav-link', { 'nav-link--cta': link.match === 'create' }]}
+          href={link.href}
+          data-nav-link={link.match}
+          aria-current={activeFor(link.match) ? 'page' : undefined}
+        >
+          {link.label}
+          {link.match === 'create' && <span class="arrow" aria-hidden="true">→</span>}
+        </a>
+      ))}
+    </nav>
+
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      aria-label="打开目录"
+      data-nav-toggle
+    >
+      <span class="nav-toggle__lines" aria-hidden="true"><span></span><span></span></span>
+      <span data-menu-label>目录</span>
+    </button>
+  </div>
+
+  <div class="site-menu" id="site-menu" data-site-menu aria-hidden="true">
+    <nav class="site-menu__nav" aria-label="目录">
+      {menuGroups.map((group) => (
+        <div class="site-menu__group">
+          <p class="micro">{group.label}</p>
+          <ul class="site-menu__list">
+            {group.links.map((link) => (
+              <li>
+                <a href={link.href}>
+                  {link.label}
+                  <span>{link.sub}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+    <p class="site-menu__note">
+      一器的完成，是土、手、釉与火共同做出的决定。本体验中的器物为数字生成。
+    </p>
+  </div>
+</header>

@@ -1,0 +1,196 @@
+---
+import { tonePalettes, type ToneName } from '../data/tones';
+
+interface Props {
+  active?: 'mouth' | 'neck' | 'shoulder' | 'belly' | 'foot' | null;
+  label?: string;
+  tone?: ToneName;
+}
+
+const {
+  active = null,
+  label = '一只青瓷梅瓶的示意图',
+  tone = 'celadon',
+} = Astro.props;
+const palette = tonePalettes[tone];
+const uid = Math.random().toString(36).slice(2, 8);
+const id = (name: string) => `${name}-${uid}`;
+---
+
+<div class="vessel-poster" data-vessel-poster data-tone={tone} data-active={active ?? undefined}>
+  <svg
+    class="vessel-poster__svg"
+    viewBox="60 30 480 740"
+    role="img"
+    aria-label={label}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <linearGradient class="tone-glaze" id={id('glaze')} x1="18%" y1="8%" x2="84%" y2="92%">
+        <stop offset="0" stop-color={palette.a} />
+        <stop offset="0.32" stop-color={palette.b} />
+        <stop offset="0.62" stop-color={palette.c} />
+        <stop offset="0.86" stop-color={palette.d} />
+        <stop offset="1" stop-color={palette.e} />
+      </linearGradient>
+      <radialGradient id={id('shade')} cx="62%" cy="42%" r="64%">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0" />
+        <stop offset="0.58" stop-color="#8a9b8d" stop-opacity="0.02" />
+        <stop offset="0.82" stop-color="#62766a" stop-opacity="0.15" />
+        <stop offset="1" stop-color="#43564c" stop-opacity="0.3" />
+      </radialGradient>
+      <radialGradient id={id('halo')} cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="#e9e1d3" stop-opacity="0.72" />
+        <stop offset="0.72" stop-color="#e9e1d3" stop-opacity="0.36" />
+        <stop offset="1" stop-color="#e9e1d3" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient class="tone-rim" id={id('rim')} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color={palette.rimA} />
+        <stop offset="0.48" stop-color={palette.rimB} />
+        <stop offset="1" stop-color={palette.rimC} />
+      </linearGradient>
+      <filter id={id('blur')} x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="8" />
+      </filter>
+      <filter id={id('soft')} x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="14" />
+      </filter>
+      <clipPath id={id('clip')}>
+        <path
+          d="M 300 74 C 324 74 332 82 332 94 L 330 112 C 329 138 325 154 322 174 C 346 214 394 252 424 296 C 448 331 460 380 460 430 C 460 500 440 556 414 604 C 394 640 374 666 364 694 L 362 710 C 362 720 354 726 344 726 L 256 726 C 246 726 238 720 238 710 L 236 694 C 226 666 206 640 186 604 C 160 556 140 500 140 430 C 140 380 152 331 176 296 C 206 252 254 214 278 174 C 275 154 271 138 270 112 L 268 94 C 268 82 276 74 300 74 Z"
+        />
+      </clipPath>
+    </defs>
+
+    <circle class="poster-halo" cx="300" cy="404" r="200" fill={`url(#${id('halo')})`} />
+    <circle class="poster-halo" cx="300" cy="404" r="196" fill="none" stroke="#1b1813" stroke-opacity="0.06" />
+    <circle class="poster-halo" cx="300" cy="404" r="224" fill="none" stroke="#1b1813" stroke-opacity="0.035" stroke-dasharray="1 9" />
+
+    <ellipse class="poster-shadow" cx="300" cy="742" rx="126" ry="16" fill="#1b1813" opacity="0.12" filter={`url(#${id('soft')})`} />
+
+    <g class="vessel-poster__bottle">
+      <path
+        d="M 300 74 C 324 74 332 82 332 94 L 330 112 C 329 138 325 154 322 174 C 346 214 394 252 424 296 C 448 331 460 380 460 430 C 460 500 440 556 414 604 C 394 640 374 666 364 694 L 362 710 C 362 720 354 726 344 726 L 256 726 C 246 726 238 720 238 710 L 236 694 C 226 666 206 640 186 604 C 160 556 140 500 140 430 C 140 380 152 331 176 296 C 206 252 254 214 278 174 C 275 154 271 138 270 112 L 268 94 C 268 82 276 74 300 74 Z"
+        fill={`url(#${id('glaze')})`}
+      />
+      <g clip-path={`url(#${id('clip')})`}>
+        <rect x="120" y="60" width="360" height="700" fill={`url(#${id('shade')})`} />
+
+        <path
+          d="M 213 250 C 190 355 199 500 240 626"
+          fill="none"
+          stroke="#ffffff"
+          stroke-opacity="0.36"
+          stroke-width="24"
+          stroke-linecap="round"
+          filter={`url(#${id('blur')})`}
+        />
+        <path
+          d="M 382 270 C 410 360 405 470 378 566"
+          fill="none"
+          stroke="#6d8275"
+          stroke-opacity="0.13"
+          stroke-width="30"
+          stroke-linecap="round"
+          filter={`url(#${id('blur')})`}
+        />
+
+        <g class="poster-crackle" stroke={palette.edge} stroke-opacity="0.18" stroke-width="1" fill="none">
+          <path d="M 250 330 C 268 356 262 384 280 408 C 294 427 292 448 304 466" />
+          <path d="M 354 300 C 342 326 352 346 338 368 C 326 388 334 406 322 426" />
+          <path d="M 214 500 C 236 516 239 536 258 548" />
+          <path d="M 372 500 C 354 520 360 536 344 552" />
+          <path d="M 282 626 C 300 640 310 660 304 678" />
+        </g>
+
+        <rect class="part-band" data-part="mouth" x="120" y="66" width="360" height="54" fill="#7c9a8b" opacity="0" />
+        <rect class="part-band" data-part="neck" x="120" y="120" width="360" height="62" fill="#7c9a8b" opacity="0" />
+        <rect class="part-band" data-part="shoulder" x="120" y="182" width="360" height="140" fill="#7c9a8b" opacity="0" />
+        <rect class="part-band" data-part="belly" x="120" y="322" width="360" height="278" fill="#7c9a8b" opacity="0" />
+        <rect class="part-band" data-part="foot" x="120" y="600" width="360" height="150" fill="#7c9a8b" opacity="0" />
+      </g>
+
+      <path
+        class="vessel-outline"
+        d="M 300 74 C 324 74 332 82 332 94 L 330 112 C 329 138 325 154 322 174 C 346 214 394 252 424 296 C 448 331 460 380 460 430 C 460 500 440 556 414 604 C 394 640 374 666 364 694 L 362 710 C 362 720 354 726 344 726 L 256 726 C 246 726 238 720 238 710 L 236 694 C 226 666 206 640 186 604 C 160 556 140 500 140 430 C 140 380 152 331 176 296 C 206 252 254 214 278 174 C 275 154 271 138 270 112 L 268 94 C 268 82 276 74 300 74 Z"
+        fill="none"
+        stroke={palette.edge}
+        stroke-opacity="0.18"
+        stroke-width="1.2"
+      />
+
+      <ellipse class="vessel-rim" cx="300" cy="84" rx="34" ry="11" fill={`url(#${id('rim')})`} stroke={palette.edge} stroke-opacity="0.24" />
+      <ellipse cx="300" cy="84" rx="21" ry="6" fill="#4b4b42" opacity="0.78" />
+      <ellipse cx="300" cy="84" rx="14" ry="3.4" fill="#2e302b" opacity="0.8" />
+
+      <path class="vessel-foot-line" d="M 244 710 C 272 716 328 716 356 710" fill="none" stroke={palette.edge} stroke-opacity="0.26" stroke-width="1.2" />
+      <path class="vessel-foot-line" d="M 250 720 C 276 725 324 725 350 720" fill="none" stroke={palette.edge} stroke-opacity="0.18" stroke-width="1.2" />
+
+      <circle class="part-anchor" data-anchor="mouth" opacity="0" cx="300" cy="100" r="3.2" fill="#4f6f63" />
+      <circle class="part-anchor" data-anchor="neck" opacity="0" cx="300" cy="152" r="3.2" fill="#4f6f63" />
+      <circle class="part-anchor" data-anchor="shoulder" opacity="0" cx="300" cy="266" r="3.2" fill="#4f6f63" />
+      <circle class="part-anchor" data-anchor="belly" opacity="0" cx="300" cy="440" r="3.2" fill="#4f6f63" />
+      <circle class="part-anchor" data-anchor="foot" opacity="0" cx="300" cy="700" r="3.2" fill="#4f6f63" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .vessel-poster {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+  }
+
+  .vessel-poster__svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .part-band {
+    opacity: 0;
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .part-anchor {
+    opacity: 0;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .vessel-poster[data-active='mouth'] [data-part='mouth'],
+  .vessel-poster[data-active='neck'] [data-part='neck'],
+  .vessel-poster[data-active='shoulder'] [data-part='shoulder'],
+  .vessel-poster[data-active='belly'] [data-part='belly'],
+  .vessel-poster[data-active='foot'] [data-part='foot'] {
+    opacity: 0.16;
+  }
+
+  .vessel-poster[data-active='mouth'] [data-anchor='mouth'],
+  .vessel-poster[data-active='neck'] [data-anchor='neck'],
+  .vessel-poster[data-active='shoulder'] [data-anchor='shoulder'],
+  .vessel-poster[data-active='belly'] [data-anchor='belly'],
+  .vessel-poster[data-active='foot'] [data-anchor='foot'] {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .vessel-poster__bottle {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: poster-float 10s ease-in-out infinite;
+    }
+  }
+
+  @keyframes poster-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-7px);
+    }
+  }
+</style>

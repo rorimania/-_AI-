@@ -1,0 +1,584 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import VesselPoster from '../components/VesselPoster.astro';
+import ProcessIcon from '../components/ProcessIcon.astro';
+import ReferencePlate from '../components/ReferencePlate.astro';
+import { chapters, hero, steps } from '../data/site';
+import { references } from '../data/references';
+---
+
+<BaseLayout
+  title="瓷韵数绎 · 把一抔土，交给时间与火"
+  description="一场关于陶瓷的数字交互体验：认识一只瓶的五处骨相，再亲手走完取土、拉坯、择釉、入窑、开窑的五道工序。"
+  page="home"
+>
+  <section class="observatory" id="observe" aria-labelledby="observe-title">
+    <div class="observatory__stage" data-vessel-stage data-mode="home">
+      <span class="observatory__index latin" data-stage-index aria-hidden="true">器</span>
+      <div class="observatory__vessel">
+        <VesselPoster label="一只青瓷梅瓶的示意图，瓶身随滚动依次高亮瓶口、瓶颈、瓶肩、瓶腹与圈足" />
+        <div class="vessel-canvas" data-vessel-canvas aria-hidden="true"></div>
+      </div>
+      <div class="observatory__caption">
+        <span class="observatory__caption-cn" data-stage-name>观器</span>
+        <span class="observatory__caption-en" data-stage-en>Observe the vessel</span>
+      </div>
+      <span class="observatory__side vertical-text" aria-hidden="true">一器一世界</span>
+    </div>
+
+    <div class="observatory__flow">
+      <div class="hero-panel">
+        <p class="eyebrow">{hero.eyebrow}</p>
+        <h1 class="hero-title" id="observe-title">
+          {hero.title.map((line, index) => (
+            <span class="hero-line">
+              <span class="hero-line__inner" style={`--line-delay: ${index * 110 + 120}ms`}>{line}</span>
+            </span>
+          ))}
+        </h1>
+        <p class="hero-lead lead">{hero.lead}</p>
+        <div class="hero-actions">
+          <a class="btn btn--solid" href="/create/clay">
+            开始制器 <span class="arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="text-link" href="#process">先看五道工序 <span class="arrow" aria-hidden="true">↓</span></a>
+        </div>
+
+        <div class="hero-meta" aria-label="体验概要">
+          {hero.meta.map((item, index) => (
+            <span class="hero-meta__item">
+              <span class="latin">{String(index + 1).padStart(2, '0')}</span>
+              <span>{item}</span>
+            </span>
+          ))}
+        </div>
+
+        <div class="hero-scroll">
+          <span class="scroll-cue">
+            向下 · 观器
+            <span class="scroll-cue__line" aria-hidden="true"></span>
+          </span>
+        </div>
+      </div>
+
+      {chapters.map((chapter) => (
+        <article
+          class="chapter"
+          data-chapter
+          data-chapter-id={chapter.id}
+          data-chapter-name={chapter.title}
+          data-chapter-en={chapter.en}
+        >
+          <span class="chapter__num latin" aria-hidden="true">{chapter.num}</span>
+          <h2 class="chapter__title">{chapter.title}</h2>
+          <p class="chapter__en micro">{chapter.en} · VESSEL</p>
+          <p class="chapter__copy">{chapter.copy}</p>
+          <span class="chapter__rule" aria-hidden="true"></span>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section process-section" id="process" aria-labelledby="process-title">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow reveal">五道工序 · Process</p>
+          <h2 class="h2 reveal" id="process-title" style="--delay: 80ms">一器之成，<br />五次决定。</h2>
+        </div>
+        <p class="section-head__note reveal" style="--delay: 140ms">
+          不是把五步做快，而是把每一步做清楚。土、手、釉、火，各自有它不能省略的时间。
+        </p>
+      </div>
+
+      <ol class="process-list">
+        {steps.map((step) => (
+          <li>
+            <a class="process-row reveal" href={step.href} style={`--delay: ${step.n * 60}ms`}>
+              <span class="process-row__num latin">0{step.n}</span>
+              <span class="process-row__title">{step.name}</span>
+              <span class="process-row__copy">{step.copy}</span>
+              <ProcessIcon name={step.icon} class="process-row__icon" />
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section collection-section" id="collection" aria-labelledby="collection-title">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow reveal">馆藏四色 · Collection</p>
+          <h2 class="h2 reveal" id="collection-title" style="--delay: 80ms">四种釉色，<br />四件参照。</h2>
+        </div>
+        <p class="section-head__note reveal" style="--delay: 140ms">
+          青、蓝、黑、紫，各自走过不同的火。它们是参照，不是标准答案。馆藏图像来自 The Met 开放获取计划，均为 CC0。
+        </p>
+      </div>
+
+      <div class="ref-grid">
+        {references.map((reference) => <ReferencePlate reference={reference} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="closing" aria-labelledby="closing-title">
+    <div class="container closing__inner">
+      <div>
+        <p class="eyebrow reveal">Beginning · 入窑之前</p>
+        <h2 class="closing__title display reveal" id="closing-title" style="--delay: 80ms">
+          窑门已备，<br />只差一只手。
+        </h2>
+      </div>
+      <div class="closing__actions reveal" style="--delay: 160ms">
+        <p class="closing__note">现在，轮到你来决定这只器物的形状与颜色。</p>
+        <a class="btn btn--solid" href="/create/clay">
+          取一抔土 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="text-link" href="#observe">回到观器 <span class="arrow" aria-hidden="true">↑</span></a>
+      </div>
+      <span class="closing__seal seal" aria-hidden="true">瓷</span>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .observatory {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    column-gap: clamp(20px, 5vw, 86px);
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    align-items: start;
+  }
+
+  .observatory__stage {
+    position: sticky;
+    top: var(--nav-h);
+    grid-column: 2;
+    grid-row: 1;
+    height: calc(100svh - var(--nav-h));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-block: clamp(24px, 5vh, 54px);
+    isolation: isolate;
+  }
+
+  .observatory__stage::before {
+    content: '';
+    position: absolute;
+    inset: 6% 4%;
+    z-index: -1;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(233, 225, 211, 0.8) 0%, rgba(233, 225, 211, 0.28) 46%, transparent 72%);
+    pointer-events: none;
+  }
+
+  .observatory__index {
+    position: absolute;
+    top: 7%;
+    left: 2%;
+    z-index: -1;
+    font-size: clamp(6rem, 12vw, 12rem);
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(27, 24, 19, 0.1);
+    transition: opacity var(--dur-3) var(--ease);
+    user-select: none;
+  }
+
+  .observatory__vessel {
+    position: relative;
+    width: min(100%, 570px);
+    height: 96%;
+    display: grid;
+    place-items: center;
+  }
+
+  .vessel-canvas {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.9s var(--ease);
+  }
+
+  .observatory__vessel :global(.vessel-poster) {
+    position: absolute;
+    inset: 0;
+    transition: opacity 0.85s var(--ease);
+  }
+
+  .observatory__stage.is-3d-ready :global(.vessel-poster) {
+    opacity: 0;
+  }
+
+  .vessel-canvas.is-ready {
+    opacity: 1;
+  }
+
+  .vessel-canvas canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .observatory__caption {
+    position: absolute;
+    right: 0;
+    bottom: clamp(18px, 4vh, 40px);
+    left: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--hairline-soft);
+    font-size: var(--text-micro);
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+  }
+
+  .observatory__caption-cn {
+    font-family: var(--font-serif);
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+  }
+
+  .observatory__caption-en {
+    font-family: var(--font-latin);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .observatory__side {
+    position: absolute;
+    top: 15%;
+    right: -0.4em;
+    color: var(--text-faint);
+    font-family: var(--font-serif);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    opacity: 0.55;
+  }
+
+  .observatory__flow {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .hero-panel {
+    min-height: calc(100svh - var(--nav-h));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: clamp(44px, 8vh, 96px);
+  }
+
+  .hero-title {
+    margin-top: 26px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.9rem, 5.4vw, 5.8rem);
+    font-weight: 500;
+    line-height: 1.16;
+    letter-spacing: 0.015em;
+    color: var(--text);
+  }
+
+  .hero-line {
+    display: block;
+    overflow: hidden;
+  }
+
+  .hero-line__inner {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-line__inner {
+      animation: hero-line-in 1.15s var(--ease) both;
+      animation-delay: var(--line-delay);
+    }
+  }
+
+  @keyframes hero-line-in {
+    from {
+      transform: translateY(112%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .hero-lead {
+    margin-top: 28px;
+    max-width: 34ch;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px 30px;
+    margin-top: 36px;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    margin-top: clamp(42px, 8vh, 82px);
+    border-top: 1px solid var(--hairline);
+    padding-top: 16px;
+  }
+
+  .hero-meta__item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    color: var(--text-soft);
+  }
+
+  .hero-meta__item + .hero-meta__item::before {
+    content: '';
+    width: 1px;
+    height: 11px;
+    margin-inline: 16px;
+    background: var(--hairline);
+  }
+
+  .hero-meta__item .latin {
+    font-size: 0.72rem;
+    color: var(--text-faint);
+  }
+
+  .hero-scroll {
+    margin-top: 34px;
+  }
+
+  .chapter {
+    min-height: 76vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: clamp(54px, 10vh, 112px);
+    border-top: 1px solid var(--hairline-soft);
+    transition: opacity var(--dur-3) var(--ease);
+  }
+
+  .chapter__num {
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+  }
+
+  .chapter__title {
+    font-family: var(--font-serif);
+    font-size: clamp(2.2rem, 3.6vw, 3.6rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    transition: color var(--dur-3) var(--ease);
+  }
+
+  .chapter__en {
+    margin-top: 12px;
+    color: var(--text-faint);
+  }
+
+  .chapter__copy {
+    max-width: 33ch;
+    margin-top: 26px;
+    color: var(--text-soft);
+    line-height: 1.95;
+  }
+
+  .chapter__rule {
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin-top: 30px;
+    background: var(--hairline);
+    transition:
+      width var(--dur-3) var(--ease),
+      background-color var(--dur-3) var(--ease);
+  }
+
+  .chapter.is-active .chapter__title {
+    color: var(--celadon-deep);
+  }
+
+  .chapter.is-active .chapter__rule {
+    width: 92px;
+    background: var(--celadon-deep);
+  }
+
+  .process-section {
+    border-top: 1px solid var(--hairline);
+    background: color-mix(in srgb, var(--paper-light) 46%, transparent);
+  }
+
+  .collection-section {
+    border-top: 1px solid var(--hairline);
+  }
+
+  .closing {
+    padding-block: clamp(96px, 15vh, 190px);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .closing__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.55fr);
+    align-items: end;
+    gap: clamp(36px, 7vw, 110px);
+  }
+
+  .closing__title {
+    margin-top: 26px;
+  }
+
+  .closing__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+    padding-bottom: 6px;
+  }
+
+  .closing__note {
+    max-width: 28ch;
+    color: var(--text-soft);
+    font-size: var(--text-sm);
+    line-height: 1.9;
+  }
+
+  .closing__seal {
+    position: absolute;
+    top: -16px;
+    right: 0;
+    transform: rotate(3deg);
+    opacity: 0.7;
+  }
+
+  @media (max-width: 960px) {
+    .observatory {
+      grid-template-columns: minmax(0, 1fr);
+      padding-inline: 0;
+    }
+
+    .observatory__stage {
+      position: sticky;
+      top: var(--nav-h);
+      z-index: 2;
+      grid-column: 1;
+      grid-row: 1;
+      height: min(50svh, 480px);
+      min-height: 340px;
+      padding-inline: var(--gutter);
+      background: var(--surface);
+      border-bottom: 1px solid var(--hairline-soft);
+    }
+
+    .observatory__flow {
+      grid-column: 1;
+      grid-row: 2;
+      padding-inline: var(--gutter);
+    }
+
+    .observatory__vessel {
+      height: 96%;
+    }
+
+    .observatory__side {
+      display: none;
+    }
+
+    .observatory__index {
+      top: 6%;
+      left: var(--gutter);
+      font-size: 6rem;
+    }
+
+    .observatory__caption {
+      display: none;
+    }
+
+    .hero-panel {
+      min-height: auto;
+      padding-block: clamp(38px, 7vh, 70px) clamp(50px, 8vh, 80px);
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 9vw, 3.7rem);
+    }
+
+    .chapter {
+      min-height: 64vh;
+      justify-content: flex-end;
+      padding-block: 14vh 2vh;
+    }
+
+    .chapter__num {
+      display: none;
+    }
+
+    .closing__inner {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .closing__seal {
+      top: 0;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .observatory__stage {
+      height: min(48svh, 420px);
+      min-height: 320px;
+    }
+
+    .observatory__vessel {
+      height: 96%;
+    }
+
+    .observatory__caption-en {
+      display: none;
+    }
+
+    .hero-meta {
+      margin-top: 36px;
+    }
+
+    .hero-meta__item + .hero-meta__item::before {
+      margin-inline: 10px;
+    }
+
+    .hero-scroll {
+      margin-top: 24px;
+    }
+
+    .chapter {
+      min-height: 60vh;
+      padding-block: 12vh 2vh;
+    }
+
+    .chapter__copy {
+      max-width: 100%;
+    }
+  }
+</style>

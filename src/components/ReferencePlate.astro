@@ -1,0 +1,45 @@
+---
+import { Picture } from 'astro:assets';
+import type { Reference } from '../data/references';
+
+interface Props {
+  reference: Reference;
+  reveal?: boolean;
+}
+
+const { reference, reveal = true } = Astro.props;
+---
+
+<figure class:list={['ref-plate', { reveal }]} style={reveal ? '--delay: 60ms' : undefined}>
+  <a
+    class="ref-plate__frame"
+    href={reference.page}
+    target="_blank"
+    rel="noopener noreferrer"
+    title={`${reference.titleEn} · The Metropolitan Museum of Art`}
+  >
+    <Picture
+      src={reference.image}
+      formats={['avif', 'webp']}
+      widths={[360, 540, 760]}
+      sizes="(max-width: 900px) 44vw, 22vw"
+      alt={reference.alt}
+      class="ref-plate__img"
+      loading="lazy"
+      decoding="async"
+    />
+    <span class="ref-plate__index" aria-hidden="true">{reference.index}</span>
+  </a>
+  <figcaption class="ref-plate__caption">
+    <span class="ref-plate__title">{reference.titleZh}</span>
+    <span class="ref-plate__meta">{reference.dateZh} · {reference.mediumZh}</span>
+    <a
+      class="ref-plate__source"
+      href={reference.page}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {reference.source} <span class="arrow" aria-hidden="true">↗</span>
+    </a>
+  </figcaption>
+</figure>

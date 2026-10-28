@@ -1,0 +1,75 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/components.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  page?: string;
+  theme?: 'paper' | 'night';
+  bodyClass?: string;
+  showFooter?: boolean;
+}
+
+const {
+  title = '瓷韵数绎 · 数字陶艺',
+  description = '以数字之手，走完取土、拉坯、择釉、入窑、开窑的五道工序。瓷韵数绎，一场关于陶瓷的交互体验。',
+  page = 'page',
+  theme = 'paper',
+  bodyClass = '',
+  showFooter = true,
+} = Astro.props;
+
+const fullTitle = title.includes('瓷韵数绎') ? title : `${title} · 瓷韵数绎`;
+const themeColor = theme === 'night' ? '#141210' : '#f3eee4';
+
+const pageAnimation = {
+  old: { name: 'page-out', duration: '0.38s', easing: 'cubic-bezier(0.65, 0, 0.35, 1)' },
+  new: { name: 'page-in', duration: '0.62s', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+};
+const pageTransition = { forwards: pageAnimation, backwards: pageAnimation };
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content={themeColor} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content="瓷韵数绎" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <ClientRouter />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body
+    class:list={[bodyClass, theme === 'night' && 'theme-night']}
+    data-page={page}
+    data-theme={theme}
+  >
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <Nav />
+    <div class="page" transition:animate={pageTransition}>
+      <main id="main" class="site-main">
+        <slot />
+      </main>
+      {showFooter && <Footer />}
+    </div>
+    <div class="toast" data-toast role="status" aria-live="polite"></div>
+    <script>
+      import '../scripts/app';
+    </script>
+  </body>
+</html>

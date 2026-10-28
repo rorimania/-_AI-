@@ -1,0 +1,38 @@
+---
+import { stepRail } from '../data/site';
+
+interface Props {
+  current: number;
+}
+
+const { current } = Astro.props;
+const numerals = ['一', '二', '三', '四', '五'];
+const progress = Math.round((current / stepRail.length) * 100);
+---
+
+<nav class="step-rail" aria-label="制器进度">
+  <div class="step-rail__inner">
+    <ol class="step-rail__list">
+      {stepRail.map((step) => (
+        <li>
+          <a
+            class:list={[
+              'step',
+              { 'is-current': step.n === current, 'is-done': step.n < current },
+            ]}
+            href={step.href}
+            aria-current={step.n === current ? 'step' : undefined}
+          >
+            <span class="step__num" aria-hidden="true">0{step.n}</span>
+            <span>{step.name}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+    <div class="step-rail__meta" aria-hidden="true">
+      <span>第{numerals[current - 1]}道</span>
+      <span class="step-rail__bar"><span style={`--progress: ${progress}%`}></span></span>
+      <span>共五道</span>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,38 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import StepRail from '../components/StepRail.astro';
+
+interface Props {
+  step: number;
+  title?: string;
+  description?: string;
+  page: string;
+  theme?: 'paper' | 'night';
+  bodyClass?: string;
+  showFooter?: boolean;
+}
+
+const {
+  step,
+  title,
+  description,
+  page,
+  theme = 'paper',
+  bodyClass = '',
+  showFooter = false,
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  page={page}
+  theme={theme}
+  bodyClass={`create-page ${bodyClass}`}
+  showFooter={showFooter}
+>
+  <StepRail current={step} />
+  <div class="create-body">
+    <slot />
+  </div>
+</BaseLayout>

@@ -1,0 +1,79 @@
+---
+import type { Craft } from '../data/crafts';
+
+interface Props {
+  craft: Craft;
+  selected?: boolean;
+  name?: string;
+  variant?: 'tile' | 'row';
+}
+
+const { craft, selected = false, name = 'craft', variant = 'tile' } = Astro.props;
+---
+
+<label
+  class:list={['craft-card', `craft-card--${variant}`, { 'is-selected': selected }]}
+  data-craft={craft.id}
+>
+  <input
+    class="sr-only"
+    type="radio"
+    name={name}
+    value={craft.id}
+    checked={selected}
+    data-craft-input
+  />
+  <span class="craft-card__dot" aria-hidden="true"></span>
+  <span class="craft-card__swatch" style={`--swatch: ${craft.swatch};`} aria-hidden="true"></span>
+  <span class="craft-card__top">
+    <span class="craft-card__name">{craft.name}<br /><span class="faint">{craft.subtitle}</span></span>
+    <span class="craft-card__temp">{craft.tempLabel}</span>
+  </span>
+  <span class="craft-card__note">{craft.note}</span>
+</label>
+
+<style>
+  .craft-card--row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-areas:
+      'swatch top'
+      'swatch note';
+    gap: 3px 14px;
+    align-items: center;
+    min-height: 0;
+    padding: 12px 14px;
+  }
+
+  .craft-card--row .craft-card__swatch {
+    grid-area: swatch;
+    width: 56px;
+    flex: 0 0 56px;
+    align-self: center;
+  }
+
+  .craft-card--row .craft-card__top {
+    grid-area: top;
+    align-items: baseline;
+  }
+
+  .craft-card--row .craft-card__name {
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .craft-card--row .craft-card__note {
+    grid-area: note;
+    font-size: 0.7rem;
+    line-height: 1.6;
+  }
+
+  .craft-card--row .craft-card__temp {
+    font-size: 0.7rem;
+  }
+
+  .craft-card--row .craft-card__dot {
+    top: 10px;
+    right: 10px;
+  }
+</style>

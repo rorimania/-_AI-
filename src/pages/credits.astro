@@ -1,0 +1,350 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReferencePlate from '../components/ReferencePlate.astro';
+import { references } from '../data/references';
+---
+
+<BaseLayout
+  title="馆藏与鸣谢"
+  description="瓷韵数绎的素材来源、许可与使用边界：The Met 开放获取图像、Poly Haven 环境光，以及未采用来源的说明。"
+  page="credits"
+>
+  <div class="credits-page">
+    <header class="credits-head">
+      <p class="eyebrow">Credits & Sources · 馆藏与鸣谢</p>
+      <h1 class="credits-head__title">素材、来源，<br />与它们的边界。</h1>
+      <p class="credits-head__lead">
+        本作品使用的馆藏图像与环境光，均来自可追溯的开放许可资源。它们帮助我们理解器型与釉色，但不替代真实文物。体验中的器物由数字生成，并非任何一件馆藏的复制。
+      </p>
+    </header>
+
+    <section class="credits-section" aria-labelledby="credits-collection">
+      <div class="credits-section__head">
+        <h2 class="h2" id="credits-collection">馆藏图像</h2>
+        <p class="credits-section__note">
+          四件中国陶瓷藏品，来自 The Metropolitan Museum of Art 的 Open Access 计划。图像与藏品数据均为 CC0。
+        </p>
+      </div>
+
+      <div class="credits-refs">
+        {references.map((reference) => <ReferencePlate reference={reference} />)}
+      </div>
+
+      <div class="credits-list">
+        {references.map((reference) => (
+          <article class="credit-item">
+            <p class="credit-item__id latin">MET · {reference.metId}</p>
+            <div class="credit-item__body">
+              <h3>{reference.titleZh}</h3>
+              <p class="credit-item__en latin">{reference.titleEn}</p>
+              <dl class="credit-item__meta">
+                <div><dt>年代</dt><dd>{reference.dateZh}</dd></div>
+                <div><dt>工艺</dt><dd>{reference.mediumZh}</dd></div>
+                <div><dt>来源</dt><dd>{reference.source}</dd></div>
+                <div><dt>Credit</dt><dd>{reference.creditLine}</dd></div>
+              </dl>
+              <a class="text-link" href={reference.page} target="_blank" rel="noopener noreferrer">
+                查看藏品页 <span class="arrow" aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="credits-section" aria-labelledby="credits-hdri">
+      <div class="credits-section__head">
+        <h2 class="h2" id="credits-hdri">环境光</h2>
+        <p class="credits-section__note">3D 展示与釉面反射使用的摄影棚环境贴图。</p>
+      </div>
+      <div class="credits-simple">
+        <div>
+          <h3>studio_small_03 · 1K HDR</h3>
+          <p>Poly Haven · CC0 · 下载于 2026-10-27</p>
+        </div>
+        <a class="text-link" href="https://polyhaven.com/a/studio_small_03" target="_blank" rel="noopener noreferrer">
+          polyhaven.com/a/studio_small_03 <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="credits-section" aria-labelledby="credits-code">
+      <div class="credits-section__head">
+        <h2 class="h2" id="credits-code">3D 与纹理</h2>
+        <p class="credits-section__note">
+          器型、釉面、纸纹与图示均在本项目中程序化生成，未使用外部 3D 扫描模型。若未来接入馆藏原件，将在此逐项记录。
+        </p>
+      </div>
+      <ul class="credits-notes">
+        <li><span class="latin">01</span> 器物几何由轮廓控制点实时生成，不使用外部 GLB。</li>
+        <li><span class="latin">02</span> 釉色、开片与纹理由 Canvas / Shader 程序化绘制。</li>
+        <li><span class="latin">03</span> 纸张颗粒与印章为内联 SVG / CSS，不依赖图库图片。</li>
+        <li><span class="latin">04</span> 字体为 Noto Serif SC 与 EB Garamond，SIL Open Font License 1.1。</li>
+      </ul>
+    </section>
+
+    <section class="credits-section" aria-labelledby="credits-scope">
+      <div class="credits-section__head">
+        <h2 class="h2" id="credits-scope">使用边界</h2>
+        <p class="credits-section__note">以下说明同时记录了素材清单里被评估、但未被采用的来源。</p>
+      </div>
+      <div class="credits-boundary">
+        <div>
+          <h3>仅作参考，不可下载</h3>
+          <p>故宫数字文物库、中国国家博物馆、上海博物馆的藏品图像按各自条款不可下载，仅用于交互与器型参考，未嵌入本作品。</p>
+        </div>
+        <div>
+          <h3>未采用的 3D 平台</h3>
+          <p>Sketchfab 的许可逐件不同，Smithsonian 3D 为 CC0；本次核心器物采用程序化几何以保证可形变与轻量，因此未使用扫描模型。Polycam / Meshroom / Blender / KIRI 记录为未来自制扫描的流程，model-viewer 未采用。</p>
+        </div>
+        <div>
+          <h3>关于 CC0</h3>
+          <p>CC0 不要求署名。本页与页脚仍逐项标注来源，是出于对原作、馆藏机构与摄影者的尊重。图像保持原貌，未做生成式修改。</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="credits-back">
+      <a class="btn btn--ghost" href="/">回到识器 <span class="arrow" aria-hidden="true">←</span></a>
+      <a class="text-link" href="/create/clay">开始制器 <span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .credits-page {
+    max-width: 1180px;
+    margin-inline: auto;
+    padding: clamp(54px, 8vh, 104px) var(--gutter) clamp(90px, 13vh, 150px);
+  }
+
+  .credits-head {
+    max-width: 860px;
+    padding-bottom: clamp(46px, 7vh, 80px);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .credits-head__title {
+    margin-top: 24px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.6rem, 4.8vw, 4.8rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+  }
+
+  .credits-head__lead {
+    max-width: 58ch;
+    margin-top: 26px;
+    color: var(--text-soft);
+    line-height: 1.95;
+  }
+
+  .credits-section {
+    padding-top: clamp(50px, 7vh, 86px);
+  }
+
+  .credits-section + .credits-section {
+    margin-top: clamp(50px, 7vh, 86px);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .credits-section__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
+    align-items: end;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+
+  .credits-section__note {
+    max-width: 40ch;
+    justify-self: end;
+    font-size: var(--text-sm);
+    line-height: 1.9;
+    color: var(--text-soft);
+  }
+
+  .credits-refs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 42px;
+  }
+
+  .credits-list {
+    border-top: 1px solid var(--hairline);
+  }
+
+  .credit-item {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 26px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+
+  .credit-item__id {
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+  }
+
+  .credit-item h3 {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .credit-item__en {
+    margin-top: 4px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--text-faint);
+  }
+
+  .credit-item__meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 26px;
+    margin: 14px 0 16px;
+  }
+
+  .credit-item__meta div {
+    display: flex;
+    gap: 10px;
+    font-size: var(--text-xs);
+    line-height: 1.7;
+  }
+
+  .credit-item__meta dt {
+    flex: 0 0 33px;
+    color: var(--text-faint);
+  }
+
+  .credit-item__meta dd {
+    color: var(--text-soft);
+  }
+
+  .credits-simple {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 18px 0;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+
+  .credits-simple h3 {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .credits-simple p {
+    margin-top: 4px;
+    font-size: var(--text-xs);
+    color: var(--text-faint);
+  }
+
+  .credits-notes {
+    display: grid;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .credits-notes li {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--hairline-soft);
+    font-size: var(--text-sm);
+    line-height: 1.9;
+    color: var(--text-soft);
+  }
+
+  .credits-notes .latin {
+    color: var(--text-faint);
+    font-size: 0.74rem;
+  }
+
+  .credits-boundary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+  }
+
+  .credits-boundary > div {
+    padding-top: 16px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .credits-boundary h3 {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .credits-boundary p {
+    margin-top: 10px;
+    font-size: var(--text-xs);
+    line-height: 1.9;
+    color: var(--text-faint);
+  }
+
+  .credits-back {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 22px;
+    margin-top: clamp(60px, 9vh, 100px);
+    padding-top: 28px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  @media (max-width: 900px) {
+    .credits-section__head {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .credits-section__note {
+      justify-self: start;
+    }
+
+    .credits-refs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .credits-boundary {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .credit-item {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .credit-item__meta {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .credits-refs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .credits-boundary {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .credits-simple {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

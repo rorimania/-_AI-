@@ -1,0 +1,64 @@
+---
+interface Props {
+  name: 'clay' | 'wheel' | 'glaze' | 'kiln' | 'vessel';
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+---
+
+<svg
+  class={className}
+  viewBox="0 0 48 48"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.1"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  {name === 'clay' && (
+    <>
+      <path d="M7 33c0-8 7-14 17-14s17 6 17 14" />
+      <path d="M6 33h36" />
+      <path d="M15 27c3-3 6-4 9-3" />
+      <path d="M29 22c3 2 4 4 5 7" />
+      <path d="M21 18c1-1 2-1 3-1" />
+      <path d="M18 37h12" opacity=".45" />
+    </>
+  )}
+  {name === 'wheel' && (
+    <>
+      <ellipse cx="24" cy="37.5" rx="15" ry="3.5" />
+      <path d="M19 34c-2-5-2-9 0-13 2-3 6-3 8 0 3 4 2 8 0 13" />
+      <path d="M24 34v3.5" />
+      <path d="M10 42h28" />
+      <path d="M31 14c3 2 5 5 5 9" opacity=".42" />
+    </>
+  )}
+  {name === 'glaze' && (
+    <>
+      <path d="M24 7c5 7 10 12 10 18a10 10 0 0 1-20 0c0-6 5-11 10-18Z" />
+      <path d="M18 26c2 3 5 3 7 1s5-2 6 1" />
+      <circle cx="20" cy="32" r="1" fill="currentColor" stroke="none" />
+    </>
+  )}
+  {name === 'kiln' && (
+    <>
+      <path d="M9 41V24c0-7 6-11 15-11s15 4 15 11v17" />
+      <path d="M6 41h36" />
+      <path d="M24 33c-3-4-2-7 0-10 0 3 4 4 4 7 0 2-2 3-4 3Z" />
+      <path d="M19 33h10" />
+      <path d="M14 41v-6h20v6" opacity=".5" />
+    </>
+  )}
+  {name === 'vessel' && (
+    <>
+      <path d="M17 12h14l-2 9c-1 4-3 6-5 6s-4-2-5-6l-2-9Z" />
+      <path d="M16 12c0-2 16-2 16 0" />
+      <path d="M24 6v4" />
+      <path d="M12 36c4 3 20 3 24 0" />
+      <path d="M15 41h18" />
+    </>
+  )}
+</svg>
