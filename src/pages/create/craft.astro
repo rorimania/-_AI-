@@ -32,6 +32,49 @@ const referenceNotes: Record<string, string> = {
       </p>
     </header>
 
+    <section class="glaze-trial" data-glaze-trial aria-labelledby="glaze-trial-title">
+      <div class="glaze-trial__intro">
+        <span class="glaze-trial__seal" aria-hidden="true">辨</span>
+        <p class="micro">试炼 · 试釉三问</p>
+        <h2 class="glaze-trial__title" id="glaze-trial-title">先听釉色，<br />再选火。</h2>
+        <p class="glaze-trial__copy">
+          每一句釉色的话，都藏着它走过的那把火。答对三问，落一枚「辨」印。
+        </p>
+        <p class="glaze-trial__count">
+          第 <span data-glaze-round>01</span> 问 <span class="faint">/ 03</span>
+        </p>
+        <button class="glaze-trial__skip" type="button" data-glaze-skip>
+          直接择釉 <span class="arrow" aria-hidden="true">↓</span>
+        </button>
+      </div>
+
+      <div class="glaze-trial__board">
+        <p class="glaze-trial__clue" data-glaze-clue>“入窑一色，出窑万彩。”</p>
+        <p class="glaze-trial__ask">这句话说的是哪一种釉？</p>
+        <div class="glaze-trial__options" data-glaze-options>
+          {crafts.map((craft) => (
+            <button class="glaze-choice" type="button" data-glaze-option={craft.id}>
+              <span class="glaze-choice__swatch" style={`--swatch: ${craft.swatch};`} aria-hidden="true"></span>
+              <span>{craft.name}</span>
+              <span class="glaze-choice__mark" aria-hidden="true">
+                <span></span><span></span>
+              </span>
+            </button>
+          ))}
+        </div>
+        <p class="glaze-trial__feedback" data-glaze-feedback role="status" aria-live="polite">
+          选一个釉色，看看火怎么说。
+        </p>
+      </div>
+
+      <div class="glaze-trial__done" data-glaze-done hidden>
+        <p class="micro">辨印 · Glaze seal</p>
+        <p class="glaze-trial__done-title">三问已过，<br />釉色认得了。</p>
+        <p class="glaze-trial__done-score" data-glaze-score>辨釉 · 100</p>
+        <p class="glaze-trial__done-copy">现在，凭你真正喜欢的那一抹颜色，往下选。</p>
+      </div>
+    </section>
+
     <div class="craft-main">
       <section
         class="craft-stage"

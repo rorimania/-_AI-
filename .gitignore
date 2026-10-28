@@ -2,7 +2,10 @@ node_modules/
 dist/
 .astro/
 .DS_Store
+.qa-shots
+.qa-shots-3d
 *.log
 .env
 .env.*
+瓷韵数绎_素材链接清单.docx
 !.env.example

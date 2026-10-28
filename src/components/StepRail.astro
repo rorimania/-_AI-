@@ -1,5 +1,6 @@
 ---
 import { stepRail } from '../data/site';
+import { JOURNEY_STAGES } from '../lib/journey';
 
 interface Props {
   current: number;
@@ -8,31 +9,93 @@ interface Props {
 const { current } = Astro.props;
 const numerals = ['一', '二', '三', '四', '五'];
 const progress = Math.round((current / stepRail.length) * 100);
+const stageFor = (n: number) => JOURNEY_STAGES.find((stage) => stage.n === n);
 ---
 
 <nav class="step-rail" aria-label="制器进度">
   <div class="step-rail__inner">
     <ol class="step-rail__list">
-      {stepRail.map((step) => (
-        <li>
-          <a
-            class:list={[
-              'step',
-              { 'is-current': step.n === current, 'is-done': step.n < current },
-            ]}
-            href={step.href}
-            aria-current={step.n === current ? 'step' : undefined}
-          >
-            <span class="step__num" aria-hidden="true">0{step.n}</span>
-            <span>{step.name}</span>
-          </a>
-        </li>
-      ))}
+      {stepRail.map((step) => {
+        const stage = stageFor(step.n);
+        return (
+          <li>
+            <a
+              class:list={[
+                'step',
+                { 'is-current': step.n === current, 'is-done': step.n < current },
+              ]}
+              href={step.href}
+              aria-current={step.n === current ? 'step' : undefined}
+              data-journey-step={stage?.id}
+            >
+              <span class="step__num" aria-hidden="true">0{step.n}</span>
+              <span>{step.name}</span>
+              <span class="step__stamp" aria-hidden="true" data-journey-step-stamp>
+                {stage?.stamp}
+              </span>
+            </a>
+          </li>
+        );
+      })}
     </ol>
     <div class="step-rail__meta" aria-hidden="true">
       <span>第{numerals[current - 1]}道</span>
       <span class="step-rail__bar"><span style={`--progress: ${progress}%`}></span></span>
       <span>共五道</span>
+      <span class="step-rail__journey">
+        <span class="step-rail__journey-mark">游印</span>
+        <span class="latin" data-journey-count>0 / 5</span>
+      </span>
     </div>
   </div>
 </nav>
+
+<style>
+  .step__stamp {
+    display: grid;
+    place-items: center;
+    width: 17px;
+    height: 17px;
+    margin-left: 1px;
+    border: 1px dashed var(--hairline);
+    border-radius: 50%;
+    font-family: var(--font-serif);
+    font-size: 0.54rem;
+    line-height: 1;
+    color: transparent;
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease),
+      border-color var(--dur-2) var(--ease),
+      color var(--dur-2) var(--ease);
+  }
+
+  .step.is-stamped .step__stamp {
+    border-color: color-mix(in srgb, var(--kiln) 55%, transparent);
+    color: var(--kiln);
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .step-rail__journey {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    padding-left: 12px;
+    border-left: 1px solid var(--hairline);
+  }
+
+  .step-rail__journey-mark {
+    font-family: var(--font-serif);
+    letter-spacing: 0.1em;
+    color: var(--text-soft);
+  }
+
+  @media (max-width: 1060px) {
+    .step-rail__journey {
+      display: none;
+    }
+  }
+</style>

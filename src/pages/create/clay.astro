@@ -51,7 +51,16 @@ const materials = [
       <div class="clay-stage" data-clay-stage>
         <div class="clay-stage__head">
           <span class="micro" id="clay-stage-title">揉泥 · Kneading</span>
-          <span class="clay-stage__count"><span data-clay-count>0</span> / 5</span>
+          <span class="clay-stage__count"><span data-clay-count>0</span> / 3</span>
+        </div>
+
+        <div class="clay-stage__quest">
+          <span class="clay-stage__quest-mark" aria-hidden="true">醒</span>
+          <span>
+            <span class="clay-stage__quest-label">第一关 · 揉泥三巡</span>
+            <span class="clay-stage__quest-copy">三次都按在记号上，泥性会更匀。</span>
+          </span>
+          <span class="clay-stage__score" data-clay-score>泥性 · 待揉</span>
         </div>
 
         <div class="clay-stage__canvas-wrap">
@@ -60,19 +69,24 @@ const materials = [
             class="clay-canvas"
             data-clay-canvas
             role="img"
-            aria-label="一团可以被按压、揉开的陶土"
+            aria-label="一团可以被按压、揉开的陶土，上面标有三处揉泥记号"
           ></canvas>
+          <div class="clay-targets" data-clay-targets aria-hidden="true">
+            <span class="clay-target is-active" data-clay-target="0" style="--target-x: 36%; --target-y: 48%;"><i></i></span>
+            <span class="clay-target" data-clay-target="1" style="--target-x: 62%; --target-y: 45%;"><i></i></span>
+            <span class="clay-target" data-clay-target="2" style="--target-x: 48%; --target-y: 63%;"><i></i></span>
+          </div>
           <p class="clay-stage__hint">
             <span class="clay-stage__hint-dot" aria-hidden="true"></span>
-            按住泥团，向两侧揉开
+            <span data-clay-hint>按住亮起的记号，向两侧揉开</span>
           </p>
         </div>
 
         <div class="clay-stage__foot">
           <div class="clay-dots" aria-hidden="true">
-            {[1, 2, 3, 4, 5].map((dot) => <span data-clay-dot={dot}></span>)}
+            {[1, 2, 3].map((dot) => <span data-clay-dot={dot}></span>)}
           </div>
-          <p class="clay-status" data-clay-status aria-live="polite">泥团已就位。</p>
+          <p class="clay-status" data-clay-status aria-live="polite">泥团已就位，第一处记号在等你。</p>
           <button class="text-link clay-skip" type="button" data-clay-complete>
             帮我揉匀 <span class="arrow" aria-hidden="true">↗</span>
           </button>
@@ -260,6 +274,113 @@ const materials = [
     font-size: 0.82rem;
     color: var(--text-faint);
     letter-spacing: 0.08em;
+  }
+
+  .clay-stage__quest {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0 11px;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+
+  .clay-stage__quest-mark {
+    display: grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    border: 1px solid color-mix(in srgb, var(--kiln) 48%, transparent);
+    border-radius: 50%;
+    color: var(--kiln);
+    font-family: var(--font-serif);
+    font-size: 0.68rem;
+  }
+
+  .clay-stage__quest-label {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+  }
+
+  .clay-stage__quest-copy {
+    display: block;
+    margin-top: 1px;
+    font-size: 0.63rem;
+    line-height: 1.55;
+    color: var(--text-faint);
+  }
+
+  .clay-stage__score {
+    align-self: start;
+    padding-top: 3px;
+    font-family: var(--font-latin);
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  .clay-targets {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .clay-target {
+    position: absolute;
+    top: var(--target-y);
+    left: var(--target-x);
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border: 1px dashed rgba(250, 246, 238, 0.82);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0.72);
+    opacity: 0;
+    transition:
+      opacity var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease);
+  }
+
+  .clay-target::before {
+    content: '';
+    position: absolute;
+    inset: -9px;
+    border: 1px solid rgba(250, 246, 238, 0.18);
+    border-radius: 50%;
+  }
+
+  .clay-target i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(250, 246, 238, 0.94);
+    box-shadow: 0 0 0 4px rgba(250, 246, 238, 0.16);
+  }
+
+  .clay-target.is-active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    animation: clay-target-breathe 2.4s ease-in-out infinite;
+  }
+
+  .clay-target.is-hit {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.55);
+  }
+
+  @keyframes clay-target-breathe {
+    0%,
+    100% {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
   }
 
   .clay-stage__canvas-wrap {

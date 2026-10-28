@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import StepRail from '../components/StepRail.astro';
+import JourneyHud from '../components/JourneyHud.astro';
 
 interface Props {
   step: number;
@@ -35,4 +36,8 @@ const {
   <div class="create-body">
     <slot />
   </div>
+  <JourneyHud current={page} />
+  <script>
+    import '../scripts/journey-hud';
+  </script>
 </BaseLayout>

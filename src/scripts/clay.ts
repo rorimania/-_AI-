@@ -1,3 +1,5 @@
+import { loadJourney, recordStage } from '../lib/journey';
+
 type Speck = { x: number; y: number; r: number; light: boolean };
 
 let cleanup: (() => void) | null = null;
@@ -21,7 +23,10 @@ function initClay() {
   const canvas = document.querySelector<HTMLCanvasElement>('[data-clay-canvas]');
   const countEl = document.querySelector<HTMLElement>('[data-clay-count]');
   const statusEl = document.querySelector<HTMLElement>('[data-clay-status]');
+  const scoreEl = document.querySelector<HTMLElement>('[data-clay-score]');
+  const hintEl = document.querySelector<HTMLElement>('[data-clay-hint]');
   const dots = Array.from(document.querySelectorAll<HTMLElement>('[data-clay-dot]'));
+  const targets = Array.from(document.querySelectorAll<HTMLElement>('[data-clay-target]'));
   const completeBtn = document.querySelector<HTMLButtonElement>('[data-clay-complete]');
   const ctaLabel = document.querySelector<HTMLElement>('[data-clay-cta-label]');
   const cta = document.querySelector<HTMLAnchorElement>('[data-clay-cta]');
@@ -29,6 +34,9 @@ function initClay() {
   if (!stage || !wrap || !canvas || !countEl || !statusEl) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
+
+  const journey = loadJourney();
+  const previousClay = journey.stages.clay;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const random = mulberry32(20261027);
@@ -42,6 +50,9 @@ function initClay() {
   let ry = 0;
 
   let kneads = 0;
+  let score = typeof previousClay?.score === 'number' ? previousClay.score : 0;
+  let lastQuality = 0;
+  const qualities: number[] = [];
   let dragging = false;
   let pointerId: number | null = null;
   let dentAngle = 0;
@@ -55,11 +66,10 @@ function initClay() {
   let specks: Speck[] = [];
 
   const messages = [
-    '泥团已就位。',
-    '第一遍。泥开始听话。',
-    '第二遍。气泡正在离开。',
-    '第三遍。泥已揉匀，可以上轮。',
-    '泥已揉匀，可以上轮。',
+    '泥团已就位，第一处记号在等你。',
+    '第一巡按准了。泥开始听话。',
+    '第二巡。气泡正在离开。',
+    '第三巡完成，泥性已经揉匀。',
   ];
 
   const blobPath = () => {
@@ -241,26 +251,66 @@ function initClay() {
     wrap.classList.add('is-ready');
   };
 
+  const paintScore = () => {
+    const rounded = Math.round(score);
+    if (scoreEl) {
+      scoreEl.textContent = kneads === 0 ? '泥性 · 待揉' : `泥性 · ${rounded}`;
+    }
+    stage.dataset.clayScore = String(rounded);
+  };
+
   const updateUi = () => {
     countEl.textContent = String(kneads);
     dots.forEach((dot, index) => dot.classList.toggle('is-filled', index < kneads));
     if (statusEl) statusEl.textContent = messages[Math.min(kneads, messages.length - 1)];
+    if (hintEl) {
+      hintEl.textContent =
+        kneads >= 3 ? '泥性已匀，可以上轮' : '按住亮起的记号，向两侧揉开';
+    }
+
+    targets.forEach((target, index) => {
+      target.classList.toggle('is-active', index === kneads && kneads < 3);
+      target.classList.toggle('is-hit', index < kneads);
+    });
+
+    paintScore();
+
     const ready = kneads >= 3;
     stage.dataset.ready = String(ready);
     if (ready) {
       if (ctaLabel) ctaLabel.textContent = '泥已匀 · 上轮拉坯';
       cta?.classList.add('is-ready');
     }
-    if (kneads >= 5 && completeBtn) {
+    if (kneads >= 3 && completeBtn) {
       completeBtn.disabled = true;
-      completeBtn.textContent = '已揉匀';
+      completeBtn.textContent = '三巡已毕';
     }
   };
 
-  const knead = () => {
-    if (kneads >= 5) return;
+  const knead = (quality: number) => {
+    if (kneads >= 3) return;
+    lastQuality = Math.max(0, Math.min(1, quality));
+    qualities.push(lastQuality);
     kneads += 1;
+    score = Math.round(
+      (qualities.reduce((sum, value) => sum + value, 0) / qualities.length) * 100,
+    );
     updateUi();
+
+    if (kneads >= 3) {
+      const note =
+        score >= 86
+          ? '三巡都落在泥心上，泥性柔和，气泡去得很干净。'
+          : score >= 60
+            ? '三次揉压略有偏差，泥性仍被揉开了。'
+            : '泥团被揉开了，下一次可以再靠近记号一点。';
+      if (statusEl) statusEl.textContent = note;
+      recordStage('clay', score, note, {
+        passes: kneads,
+        accuracy: score,
+        quality: Number(lastQuality.toFixed(2)),
+      });
+    }
   };
 
   const pointerPosition = (event: PointerEvent) => {
@@ -285,7 +335,26 @@ function initClay() {
     dentAngle = Math.atan2(point.y - cy, point.x - cx);
     dentDepth = 0.075;
     squash = Math.max(-0.035, Math.min(0.035, (point.y - cy) / ry * 0.025));
-    knead();
+
+    const activeTarget = targets[kneads];
+    if (activeTarget && kneads < 3) {
+      const targetRect = activeTarget.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      const targetX = targetRect.left - canvasRect.left + targetRect.width / 2;
+      const targetY = targetRect.top - canvasRect.top + targetRect.height / 2;
+      const distance = Math.hypot(point.x - targetX, point.y - targetY);
+      const hitRadius = Math.max(46, Math.min(width, height) * 0.22);
+
+      if (distance > hitRadius) {
+        if (statusEl) statusEl.textContent = '这一下偏开了，把手移向亮起的记号。';
+        wake();
+        return;
+      }
+
+      const quality = 1 - Math.min(1, distance / hitRadius);
+      knead(0.55 + quality * 0.45);
+    }
+
     wake();
   };
 
@@ -316,14 +385,23 @@ function initClay() {
   };
 
   const onComplete = () => {
-    kneads = 5;
+    if (kneads >= 3) return;
+    const filled = qualities.reduce((sum, value) => sum + value, 0) + 0.58 * (3 - qualities.length);
+    score = Math.max(55, Math.round((filled / 3) * 100));
+    qualities.push(0.58);
+    kneads = 3;
     dentAngle = -0.9;
     dentDepth = 0.085;
     squash = 0.03;
     pressAlpha = 0;
     updateUi();
     wake();
-    if (statusEl) statusEl.textContent = '泥已揉匀，可以上轮。';
+    if (statusEl) statusEl.textContent = '帮你揉匀了，泥性可以上轮。';
+    recordStage('clay', score, '请人代揉，泥也匀了，只是手感少了一点。', {
+      passes: 3,
+      assisted: true,
+      accuracy: score,
+    });
   };
 
   canvas.addEventListener('pointerdown', onPointerDown);

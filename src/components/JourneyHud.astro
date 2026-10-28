@@ -1,0 +1,494 @@
+---
+import { JOURNEY_STAGES } from '../lib/journey';
+
+interface Props {
+  current?: string;
+}
+
+const { current = '' } = Astro.props;
+---
+
+<div class="journey-hud" data-journey-hud data-current-stage={current}>
+  <button
+    class="journey-hud__tab"
+    type="button"
+    aria-expanded="false"
+    aria-controls="journey-panel"
+    data-journey-toggle
+  >
+    <span class="journey-hud__seal seal" aria-hidden="true">谱</span>
+    <span class="journey-hud__tab-copy">
+      <span>游器谱</span>
+      <span class="journey-hud__count" data-journey-count>0 / 5</span>
+    </span>
+    <span class="journey-hud__pip" aria-hidden="true"></span>
+  </button>
+
+  <p class="journey-hud__nudge" data-journey-nudge>
+    五关五印，走完会生成一页游器手札
+  </p>
+
+  <aside
+    class="journey-panel"
+    id="journey-panel"
+    aria-label="游器手札"
+    aria-hidden="true"
+    data-journey-panel
+  >
+    <header class="journey-panel__head">
+      <div>
+        <p class="micro">Field notes · 游器手札</p>
+        <h2 class="journey-panel__title">五关，五印。</h2>
+      </div>
+      <button class="journey-panel__close" type="button" aria-label="收起游器谱" data-journey-close>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+    </header>
+
+    <p class="journey-panel__intro">
+      每一关都留一枚手印。印记不是分数，它只记下你怎样走过这道工序。
+    </p>
+
+    <ol class="journey-stages">
+      {JOURNEY_STAGES.map((stage) => (
+        <li class="journey-stage" data-journey-stage={stage.id}>
+          <a class="journey-stage__link" href={stage.href}>
+            <span class="journey-stage__mark" aria-hidden="true">
+              <span data-stage-stamp>{stage.stamp}</span>
+            </span>
+            <span class="journey-stage__body">
+              <span class="journey-stage__top">
+                <span class="journey-stage__name">{stage.name}</span>
+                <span class="journey-stage__score" data-stage-score>未落印</span>
+              </span>
+              <span class="journey-stage__quest">{stage.quest}</span>
+              <span class="journey-stage__note" data-stage-note>{stage.hint}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ol>
+
+    <footer class="journey-panel__foot">
+      <div class="journey-panel__progress">
+        <span class="micro">本次游历</span>
+        <span class="journey-panel__bar"><span data-journey-bar></span></span>
+        <span class="journey-panel__time" data-journey-time>0 分 00 秒</span>
+      </div>
+      <div class="journey-panel__actions">
+        <button class="journey-panel__reset" type="button" data-journey-reset>
+          重新游器
+        </button>
+        <span class="journey-panel__footnote">进度只留在这台设备</span>
+      </div>
+    </footer>
+  </aside>
+</div>
+
+<style>
+  .journey-hud {
+    position: fixed;
+    right: clamp(14px, 2.2vw, 30px);
+    bottom: clamp(16px, 2.8vh, 30px);
+    z-index: 46;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .journey-hud__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 6px 14px 6px 8px;
+    pointer-events: auto;
+    border: 1px solid var(--hairline);
+    background: color-mix(in srgb, var(--paper-light) 92%, transparent);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 12px 34px rgba(52, 37, 23, 0.08);
+    transition:
+      border-color var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease);
+  }
+
+  .journey-hud__tab:hover,
+  .journey-hud__tab:focus-visible {
+    border-color: color-mix(in srgb, var(--text) 38%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .journey-hud__seal {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-serif);
+    font-size: 0.94rem;
+  }
+
+  .journey-hud__tab-copy {
+    display: grid;
+    gap: 1px;
+    text-align: left;
+    font-family: var(--font-serif);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+  }
+
+  .journey-hud__count {
+    font-family: var(--font-latin);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+  }
+
+  .journey-hud__pip {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--celadon-deep);
+    box-shadow: 0 0 0 3px rgba(124, 154, 139, 0.12);
+    transition: background-color var(--dur-2) var(--ease);
+  }
+
+  .journey-hud.is-nudging .journey-hud__tab {
+    animation: journey-nudge 3.4s var(--ease) 2;
+  }
+
+  .journey-hud__nudge {
+    max-width: 210px;
+    padding: 7px 10px;
+    pointer-events: none;
+    border-left: 1px solid var(--celadon-deep);
+    background: color-mix(in srgb, var(--paper-light) 88%, transparent);
+    font-size: 0.66rem;
+    line-height: 1.6;
+    letter-spacing: 0.06em;
+    color: var(--text-soft);
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease);
+  }
+
+  .journey-hud.is-nudging .journey-hud__nudge {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @keyframes journey-nudge {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  .journey-panel {
+    position: relative;
+    width: min(368px, calc(100vw - 28px));
+    max-height: min(76svh, 660px);
+    overflow: auto;
+    pointer-events: auto;
+    padding: 22px 22px 18px;
+    border: 1px solid var(--hairline);
+    background:
+      linear-gradient(90deg, transparent 0 7px, rgba(27, 24, 19, 0.035) 7px 8px, transparent 8px),
+      var(--paper-light);
+    box-shadow:
+      0 30px 70px rgba(43, 31, 20, 0.16),
+      inset 0 0 0 6px rgba(243, 238, 228, 0.4);
+    transform-origin: bottom right;
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+    visibility: hidden;
+    transition:
+      opacity var(--dur-3) var(--ease),
+      transform var(--dur-3) var(--ease),
+      visibility 0s linear var(--dur-3);
+  }
+
+  .journey-hud.is-open .journey-panel {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+    transition:
+      opacity var(--dur-3) var(--ease),
+      transform var(--dur-3) var(--ease),
+      visibility 0s;
+  }
+
+  .journey-panel::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid var(--hairline-soft);
+    pointer-events: none;
+  }
+
+  .journey-panel__head {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .journey-panel__title {
+    margin-top: 8px;
+    font-family: var(--font-serif);
+    font-size: 1.55rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+  }
+
+  .journey-panel__close {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    border: 1px solid var(--hairline);
+    transition: border-color var(--dur-1) var(--ease);
+  }
+
+  .journey-panel__close:hover {
+    border-color: var(--text);
+  }
+
+  .journey-panel__close span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 1px;
+    background: var(--text-soft);
+  }
+
+  .journey-panel__close span:first-child {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  .journey-panel__close span:last-child {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+
+  .journey-panel__intro {
+    margin-top: 14px;
+    font-size: 0.73rem;
+    line-height: 1.8;
+    color: var(--text-faint);
+  }
+
+  .journey-stages {
+    display: grid;
+    margin-top: 12px;
+    border-top: 1px solid var(--hairline-soft);
+  }
+
+  .journey-stage {
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+
+  .journey-stage__link {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 12px;
+    padding: 11px 0;
+    transition: opacity var(--dur-1) var(--ease);
+  }
+
+  .journey-stage__link:hover {
+    opacity: 0.72;
+  }
+
+  .journey-stage__mark {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px dashed var(--hairline);
+    border-radius: 50%;
+    font-family: var(--font-serif);
+    font-size: 0.76rem;
+    color: var(--text-faint);
+    transition:
+      border-color var(--dur-2) var(--ease),
+      background-color var(--dur-2) var(--ease),
+      color var(--dur-2) var(--ease);
+  }
+
+  .journey-stage.is-done .journey-stage__mark {
+    border: 1px solid var(--kiln);
+    background: color-mix(in srgb, var(--kiln) 10%, transparent);
+    color: var(--kiln);
+  }
+
+  .journey-stage.is-done .journey-stage__mark::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 1px solid color-mix(in srgb, var(--kiln) 36%, transparent);
+    border-radius: 50%;
+  }
+
+  .journey-stage.is-current .journey-stage__mark {
+    border-color: var(--celadon-deep);
+    color: var(--celadon-deep);
+  }
+
+  .journey-stage__body {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .journey-stage__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .journey-stage__name {
+    font-family: var(--font-serif);
+    font-size: 0.86rem;
+    letter-spacing: 0.08em;
+  }
+
+  .journey-stage__score {
+    font-family: var(--font-latin);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  .journey-stage__quest {
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+  }
+
+  .journey-stage__note {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    font-size: 0.64rem;
+    line-height: 1.7;
+    color: var(--text-faint);
+  }
+
+  .journey-stage.is-done .journey-stage__note {
+    -webkit-line-clamp: 2;
+  }
+
+  .journey-panel__foot {
+    padding-top: 14px;
+  }
+
+  .journey-panel__progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .journey-panel__bar {
+    flex: 1;
+    height: 1px;
+    background: var(--hairline);
+    overflow: hidden;
+  }
+
+  .journey-panel__bar span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: var(--kiln);
+    transition: width var(--dur-3) var(--ease);
+  }
+
+  .journey-panel__time {
+    font-family: var(--font-latin);
+    font-size: 0.63rem;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  .journey-panel__actions {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .journey-panel__reset {
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 2px;
+    transition: color var(--dur-1) var(--ease);
+  }
+
+  .journey-panel__reset:hover {
+    color: var(--kiln);
+  }
+
+  .journey-panel__footnote {
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+  }
+
+  @media (max-width: 760px) {
+    .journey-hud {
+      right: 12px;
+      bottom: 12px;
+    }
+
+    .journey-hud__tab {
+      min-height: 42px;
+      padding: 4px 10px 4px 6px;
+    }
+
+    .journey-hud__seal {
+      width: 30px;
+      height: 30px;
+      font-size: 0.8rem;
+    }
+
+    .journey-panel {
+      width: calc(100vw - 24px);
+      max-height: calc(100svh - 112px);
+      padding: 20px 18px 16px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .journey-hud.is-nudging .journey-hud__tab {
+      animation: none;
+    }
+  }
+
+  @media print {
+    .journey-hud {
+      display: none;
+    }
+  }
+</style>

@@ -23,6 +23,66 @@ export const defaultProfile: ProfilePoint[] = [
   { y: 1.0, r: 0.118 },
 ];
 
+export interface ProfilePreset {
+  id: string;
+  label: string;
+  note: string;
+  profile: ProfilePoint[];
+}
+
+export const PROFILE_PRESETS: ProfilePreset[] = [
+  {
+    id: 'meiping',
+    label: '梅瓶',
+    note: '丰肩，修长',
+    profile: defaultProfile,
+  },
+  {
+    id: 'yuhuchun',
+    label: '玉壶春',
+    note: '撇口，垂腹',
+    profile: [
+      { y: 0.0, r: 0.215 },
+      { y: 0.035, r: 0.225 },
+      { y: 0.1, r: 0.255 },
+      { y: 0.22, r: 0.35 },
+      { y: 0.34, r: 0.425 },
+      { y: 0.44, r: 0.445 },
+      { y: 0.54, r: 0.415 },
+      { y: 0.64, r: 0.335 },
+      { y: 0.73, r: 0.205 },
+      { y: 0.8, r: 0.13 },
+      { y: 0.87, r: 0.108 },
+      { y: 0.94, r: 0.132 },
+      { y: 1.0, r: 0.185 },
+    ],
+  },
+  {
+    id: 'jar',
+    label: '罐',
+    note: '圆肩，饱满',
+    profile: [
+      { y: 0.0, r: 0.3 },
+      { y: 0.035, r: 0.315 },
+      { y: 0.1, r: 0.356 },
+      { y: 0.23, r: 0.415 },
+      { y: 0.38, r: 0.458 },
+      { y: 0.5, r: 0.47 },
+      { y: 0.61, r: 0.442 },
+      { y: 0.71, r: 0.372 },
+      { y: 0.79, r: 0.288 },
+      { y: 0.86, r: 0.228 },
+      { y: 0.92, r: 0.202 },
+      { y: 0.96, r: 0.218 },
+      { y: 1.0, r: 0.236 },
+    ],
+  },
+];
+
+export const PROFILE_PRESET_BY_ID = Object.fromEntries(
+  PROFILE_PRESETS.map((preset) => [preset.id, preset]),
+) as Record<string, ProfilePreset>;
+
 export const PART_RANGES = {
   mouth: [0.875, 1.0],
   neck: [0.775, 0.875],
