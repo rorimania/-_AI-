@@ -80,6 +80,39 @@ const phases = [
         </p>
       </div>
 
+      <section class="fire-trial" data-fire-trial aria-labelledby="fire-trial-title">
+        <div class="fire-trial__head">
+          <p class="micro" id="fire-trial-title">试炼 · 候火三刻</p>
+          <span class="fire-trial__rounds" data-fire-rounds>0 / 3</span>
+        </div>
+        <p class="fire-trial__lead">
+          火色游走时，等它落进保温带，再投这一把柴。
+        </p>
+        <div class="fire-trial__meter" data-fire-meter>
+          <span class="fire-trial__track" aria-hidden="true"></span>
+          <span class="fire-trial__zone" data-fire-zone aria-hidden="true"></span>
+          <span class="fire-trial__needle" data-fire-needle aria-hidden="true"></span>
+          <span class="fire-trial__meter-mark fire-trial__meter-mark--low" aria-hidden="true"></span>
+          <span class="fire-trial__meter-mark fire-trial__meter-mark--high" aria-hidden="true"></span>
+        </div>
+        <div class="fire-trial__scale" aria-hidden="true">
+          <span>1160°C</span>
+          <span>保温带</span>
+          <span>1380°C</span>
+        </div>
+        <div class="fire-trial__controls">
+          <button class="fire-trial__strike" type="button" data-fire-strike>
+            投柴 <span class="arrow" aria-hidden="true">↑</span>
+          </button>
+          <button class="fire-trial__skip" type="button" data-fire-skip>
+            跳过试炼
+          </button>
+        </div>
+        <p class="fire-trial__feedback" data-fire-feedback role="status" aria-live="polite">
+          火候未动，等一等。
+        </p>
+      </section>
+
       <div class="fire-panel__section">
         <p class="micro">烧成阶段 · Phases</p>
         <ol class="kiln-phases">
@@ -113,6 +146,10 @@ const phases = [
       </div>
     </aside>
   </div>
+
+  <script>
+    import '../../scripts/fire-game';
+  </script>
 </CreateLayout>
 
 <style>
@@ -387,6 +424,225 @@ const phases = [
     font-size: var(--text-sm);
     line-height: 1.9;
     color: rgba(232, 217, 197, 0.6);
+  }
+
+  .fire-trial {
+    position: relative;
+    padding: 14px;
+    border: 1px solid rgba(232, 217, 197, 0.13);
+    background:
+      radial-gradient(circle at 78% 24%, rgba(226, 118, 67, 0.1), transparent 48%),
+      rgba(232, 217, 197, 0.025);
+    transition: border-color var(--dur-2) var(--ease);
+  }
+
+  .fire-trial.is-done {
+    border-color: rgba(226, 118, 67, 0.34);
+  }
+
+  .fire-trial__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .fire-trial .micro {
+    color: var(--night-faint);
+  }
+
+  .fire-trial__rounds {
+    font-family: var(--font-latin);
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    color: var(--kiln-bright);
+  }
+
+  .fire-trial__lead {
+    margin-top: 8px;
+    font-size: 0.7rem;
+    line-height: 1.7;
+    color: rgba(232, 217, 197, 0.5);
+  }
+
+  .fire-trial__meter {
+    position: relative;
+    height: 34px;
+    margin-top: 14px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .fire-trial__track {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: rgba(232, 217, 197, 0.13);
+  }
+
+  .fire-trial__track::before,
+  .fire-trial__track::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    width: 1px;
+    height: 7px;
+    background: rgba(232, 217, 197, 0.22);
+  }
+
+  .fire-trial__track::before {
+    left: 0;
+  }
+
+  .fire-trial__track::after {
+    right: 0;
+  }
+
+  .fire-trial__zone {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    width: 18%;
+    height: 18px;
+    transform: translateY(-50%);
+    border: 1px dashed rgba(226, 118, 67, 0.5);
+    background: linear-gradient(90deg, rgba(226, 118, 67, 0.04), rgba(226, 118, 67, 0.16), rgba(226, 118, 67, 0.04));
+    transition:
+      left 0.55s var(--ease),
+      width 0.55s var(--ease);
+  }
+
+  .fire-trial__zone::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--kiln-bright);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px rgba(226, 118, 67, 0.7);
+  }
+
+  .fire-trial__needle {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    width: 1px;
+    background: var(--night-ink);
+    box-shadow: 0 0 10px rgba(232, 217, 197, 0.35);
+    transform: translateX(-50%);
+    will-change: left;
+  }
+
+  .fire-trial__needle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: var(--night-ink);
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .fire-trial__meter.is-hit .fire-trial__zone {
+    border-style: solid;
+    animation: fire-zone-pulse 0.6s var(--ease);
+  }
+
+  .fire-trial__meter.is-miss .fire-trial__needle {
+    background: var(--kiln-bright);
+  }
+
+  @keyframes fire-zone-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(226, 118, 67, 0.32);
+    }
+    100% {
+      box-shadow: 0 0 0 14px rgba(226, 118, 67, 0);
+    }
+  }
+
+  .fire-trial__scale {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 2px;
+    font-family: var(--font-latin);
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+    color: rgba(232, 217, 197, 0.28);
+  }
+
+  .fire-trial__scale span:nth-child(2) {
+    color: rgba(226, 118, 67, 0.65);
+  }
+
+  .fire-trial__controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 13px;
+  }
+
+  .fire-trial__strike {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 34px;
+    padding: 0 15px;
+    border: 1px solid rgba(232, 217, 197, 0.38);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    color: var(--night-ink);
+    transition:
+      border-color var(--dur-1) var(--ease),
+      background-color var(--dur-1) var(--ease);
+  }
+
+  .fire-trial__strike:hover,
+  .fire-trial__strike:focus-visible {
+    border-color: var(--kiln-bright);
+    background: rgba(226, 118, 67, 0.08);
+  }
+
+  .fire-trial__strike[disabled] {
+    opacity: 0.36;
+    cursor: not-allowed;
+  }
+
+  .fire-trial__skip {
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    color: rgba(232, 217, 197, 0.34);
+    transition: color var(--dur-1) var(--ease);
+  }
+
+  .fire-trial__skip:hover {
+    color: var(--night-ink);
+  }
+
+  .fire-trial__feedback {
+    min-height: 1.5em;
+    margin-top: 9px;
+    font-size: 0.64rem;
+    line-height: 1.6;
+    color: rgba(232, 217, 197, 0.36);
+    transition: color var(--dur-2) var(--ease);
+  }
+
+  .fire-trial__feedback.is-hit {
+    color: #e7c39c;
+  }
+
+  .fire-trial__feedback.is-miss {
+    color: rgba(226, 118, 67, 0.78);
   }
 
   .fire-panel__section {

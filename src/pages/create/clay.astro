@@ -552,6 +552,12 @@ const materials = [
     }
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .clay-target.is-active {
+      animation: none;
+    }
+  }
+
   @media (max-width: 520px) {
     .clay-material {
       grid-template-columns: 28px minmax(0, 1fr) 48px;

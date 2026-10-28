@@ -1,5 +1,6 @@
 import { crafts } from '../data/crafts';
 import { tonePalettes } from '../data/tones';
+import { loadJourney, setJourneyCraft } from '../lib/journey';
 
 let cleanup: (() => void) | null = null;
 
@@ -58,6 +59,8 @@ function initCraft() {
       detail.hidden = detail.dataset.craftDetail !== craft.id;
     });
 
+    setJourneyCraft(craft.id);
+
     document.dispatchEvent(
       new CustomEvent('ciyun:craft-change', {
         detail: { craft: craft.id, tone: craft.tone },
@@ -72,7 +75,11 @@ function initCraft() {
 
   inputs.forEach((input) => input.addEventListener('change', onChange));
 
-  const initial = inputs.find((input) => input.checked)?.value ?? crafts[0].id;
+  const savedCraft = loadJourney().craft;
+  const initial =
+    inputs.find((input) => input.value === savedCraft)?.value ??
+    inputs.find((input) => input.checked)?.value ??
+    crafts[0].id;
   if (initial !== current) apply(initial);
 
   cleanup = () => {

@@ -112,6 +112,7 @@ export const navLinks = [
   { label: '识器', href: '/#observe', match: 'home' },
   { label: '工序', href: '/#process', match: 'process' },
   { label: '馆藏', href: '/#collection', match: 'collection' },
+  { label: '器影', href: '/#gallery', match: 'gallery' },
   { label: '制器', href: '/create/clay', match: 'create' },
 ];
 

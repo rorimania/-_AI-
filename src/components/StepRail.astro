@@ -38,14 +38,23 @@ const stageFor = (n: number) => JOURNEY_STAGES.find((stage) => stage.n === n);
         );
       })}
     </ol>
-    <div class="step-rail__meta" aria-hidden="true">
-      <span>第{numerals[current - 1]}道</span>
-      <span class="step-rail__bar"><span style={`--progress: ${progress}%`}></span></span>
-      <span>共五道</span>
-      <span class="step-rail__journey">
-        <span class="step-rail__journey-mark">游印</span>
+    <div class="step-rail__meta">
+      <span aria-hidden="true">第{numerals[current - 1]}道</span>
+      <span class="step-rail__bar" aria-hidden="true"><span style={`--progress: ${progress}%`}></span></span>
+      <span aria-hidden="true">共五道</span>
+      <button
+        class="step-rail__journey"
+        type="button"
+        data-journey-toggle
+        aria-expanded="false"
+        aria-controls="journey-panel"
+        title="打开游器手札"
+      >
+        <span class="step-rail__journey-mark">游器谱</span>
+        <span class="step-rail__journey-short" aria-hidden="true">谱</span>
         <span class="latin" data-journey-count>0 / 5</span>
-      </span>
+        <span class="step-rail__journey-dot" aria-hidden="true"></span>
+      </button>
     </div>
   </div>
 </nav>
@@ -81,20 +90,88 @@ const stageFor = (n: number) => JOURNEY_STAGES.find((stage) => stage.n === n);
 
   .step-rail__journey {
     display: inline-flex;
-    align-items: baseline;
-    gap: 5px;
-    padding-left: 12px;
-    border-left: 1px solid var(--hairline);
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    min-height: 28px;
+    padding: 0 9px;
+    border: 1px solid var(--hairline);
+    font-family: var(--font-sans);
+    font-size: var(--text-micro);
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+    transition:
+      border-color var(--dur-1) var(--ease),
+      background-color var(--dur-1) var(--ease),
+      color var(--dur-1) var(--ease);
+  }
+
+  .step-rail__journey:hover,
+  .step-rail__journey:focus-visible {
+    border-color: color-mix(in srgb, var(--text) 36%, transparent);
+    background: color-mix(in srgb, var(--paper-light) 72%, transparent);
+    color: var(--text);
   }
 
   .step-rail__journey-mark {
     font-family: var(--font-serif);
     letter-spacing: 0.1em;
-    color: var(--text-soft);
   }
 
-  @media (max-width: 1060px) {
+  .step-rail__journey-short {
+    display: none;
+    font-family: var(--font-serif);
+    letter-spacing: 0.1em;
+  }
+
+  .step-rail__journey .latin {
+    font-size: 0.62rem;
+    color: var(--text-faint);
+  }
+
+  .step-rail__journey-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--celadon-deep);
+    box-shadow: 0 0 0 3px rgba(124, 154, 139, 0.12);
+  }
+
+  @media (max-width: 1180px) {
+    .step-rail__meta > span,
+    .step-rail__bar {
+      display: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .step-rail__meta {
+      display: flex;
+    }
+
+    .step-rail__list {
+      flex: 1;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .step__stamp {
+      display: none;
+    }
+
     .step-rail__journey {
+      min-height: 24px;
+      padding: 0 7px;
+      font-size: 0.6rem;
+      letter-spacing: 0.06em;
+    }
+
+    .step-rail__journey-mark {
+      display: inline;
+    }
+
+    .step-rail__journey-short,
+    .step-rail__journey-dot {
       display: none;
     }
   }

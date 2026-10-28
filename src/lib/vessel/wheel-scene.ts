@@ -47,9 +47,9 @@ function createTurntable() {
   const group = new THREE.Group();
 
   const plinthMaterial = new THREE.MeshStandardMaterial({
-    color: '#b79c7e',
-    roughness: 0.66,
-    metalness: 0.04,
+    color: '#94785c',
+    roughness: 0.72,
+    metalness: 0.03,
   });
   const plinth = new THREE.Mesh(
     new THREE.CylinderGeometry(1.06, 1.13, 0.075, 128),
@@ -59,11 +59,11 @@ function createTurntable() {
   group.add(plinth);
 
   const topMaterial = new THREE.MeshPhysicalMaterial({
-    color: '#cbb493',
-    roughness: 0.4,
+    color: '#bca283',
+    roughness: 0.48,
     metalness: 0.02,
-    clearcoat: 0.25,
-    clearcoatRoughness: 0.5,
+    clearcoat: 0.22,
+    clearcoatRoughness: 0.52,
   });
   const top = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 0.022, 128), topMaterial);
   top.position.y = -1.2;
@@ -170,8 +170,8 @@ export function mountWheelScene(
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 30);
-  const cameraBase = new THREE.Vector3(0.24, 0.38, 5.15);
-  const lookTarget = new THREE.Vector3(0, 0.08, 0);
+  const cameraBase = new THREE.Vector3(0.24, 0.32, 5.7);
+  const lookTarget = new THREE.Vector3(0, 0.01, 0);
 
   const dimensions: VesselDimensions = resolveDimensions({
     height: 2.4,
@@ -186,6 +186,7 @@ export function mountWheelScene(
   let mode: 'shape' | 'rotate' = 'shape';
   let autoRotate = !reduceMotion;
   let spin = 0;
+  let zoom = 1;
   let pointerYaw = 0;
   let hoverX = 0;
   let hoverY = 0;
@@ -196,13 +197,13 @@ export function mountWheelScene(
   vesselGroup.add(createTurntable());
 
   const clayMaterial = createGlazeMaterial(renderer, {
-    color: '#c59b73',
-    roughness: 0.62,
-    clearcoat: 0.16,
-    bumpStrength: 0.0034,
+    color: '#b8865d',
+    roughness: 0.58,
+    clearcoat: 0.14,
+    bumpStrength: 0.0042,
   });
-  clayMaterial.clearcoatRoughness = 0.55;
-  clayMaterial.envMapIntensity = 0.72;
+  clayMaterial.clearcoatRoughness = 0.6;
+  clayMaterial.envMapIntensity = 0.78;
 
   let vesselMesh = new THREE.Mesh(createVesselGeometry(profile, dimensions), clayMaterial);
   vesselMesh.rotation.y = 0.24;
@@ -292,7 +293,7 @@ export function mountWheelScene(
     width = Math.max(1, rect.width);
     height = Math.max(1, rect.height);
     camera.aspect = width / height;
-    const baseDistance = width / height > 1.05 ? 5.15 : 5.55;
+    const baseDistance = width / height > 1.05 ? 5.7 : 6.15;
     cameraBase.z = baseDistance;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.4 : 1.8));
@@ -324,10 +325,20 @@ export function mountWheelScene(
     for (let i = 1; i < PROFILE_CONTROLS - 1; i += 1) {
       const distance = Math.abs(i - index);
       if (distance > 2) continue;
-      const weight = distance === 0 ? 1 : distance === 1 ? 0.36 : 0.12;
+      const weight = distance === 0 ? 1 : distance === 1 ? 0.42 : 0.16;
       profile[i].r = clamp(profile[i].r + delta * weight, MIN_RADIUS, MAX_RADIUS);
     }
+    // A light pass keeps the silhouette curated instead of letting a single
+    // drag create a kink in the lathe.
+    for (let i = 1; i < PROFILE_CONTROLS - 1; i += 1) {
+      profile[i].r = clamp(
+        profile[i].r * 0.78 + (profile[i - 1].r + profile[i + 1].r) * 0.11,
+        MIN_RADIUS,
+        MAX_RADIUS,
+      );
+    }
     dirty = true;
+    ringDirty = true;
   };
 
   const pointerPositionX = (event: PointerEvent) => {
@@ -371,7 +382,7 @@ export function mountWheelScene(
     if (mode === 'shape') {
       if (activeIndex < 0) return;
       const sensitivity = 0.46 / Math.max(420, width);
-      applyDelta(activeIndex, dx * sensitivity * dimensions.radiusScale * 3.2);
+      applyDelta(activeIndex, dx * sensitivity * dimensions.radiusScale * 2.15);
     } else {
       pointerYaw += dx * 0.006;
     }
@@ -467,6 +478,12 @@ export function mountWheelScene(
     lastTime = performance.now();
   };
 
+  const onWheelZoom = (event: WheelEvent) => {
+    if (!visible) return;
+    event.preventDefault();
+    zoom = clamp(zoom + event.deltaY * 0.00055, 0.84, 1.16);
+  };
+
   const onWheelPointer = (event: PointerEvent) => {
     if (!visible || document.hidden) return;
     if (event.pointerType === 'mouse') {
@@ -488,6 +505,7 @@ export function mountWheelScene(
   canvas.addEventListener('pointerup', finishPointer);
   canvas.addEventListener('pointercancel', finishPointer);
   canvas.addEventListener('pointerleave', onPointerLeave);
+  stage.addEventListener('wheel', onWheelZoom, { passive: false });
   document.addEventListener('visibilitychange', onVisibility);
 
   const resizeObserver = new ResizeObserver(() => {
@@ -506,6 +524,9 @@ export function mountWheelScene(
   intersectionObserver.observe(hostEl);
 
   resize();
+  camera.position.copy(cameraBase);
+  camera.lookAt(lookTarget);
+  camera.updateMatrixWorld();
 
   const firstRender = () => {
     renderer.render(scene, camera);
@@ -527,14 +548,14 @@ export function mountWheelScene(
 
     if (!dragging) {
       if (autoRotate && !reduceMotion) spin += delta * 0.17;
-      else if (!autoRotate) spin += delta * 0.012;
+      else if (!autoRotate && !reduceMotion) spin += delta * 0.012;
     }
     vesselGroup.rotation.y = spin + pointerYaw;
 
     const targetX = cameraBase.x + hoverX * 0.055 + pointerYaw * 0.04;
     const targetY = cameraBase.y - hoverY * 0.028;
     camera.position.lerp(
-      new THREE.Vector3(targetX, targetY, cameraBase.z),
+      new THREE.Vector3(targetX, targetY, cameraBase.z * zoom),
       reduceMotion ? 1 : 0.08,
     );
     camera.position.x = clamp(camera.position.x, -0.42, 0.42);
@@ -563,6 +584,7 @@ export function mountWheelScene(
       canvas.removeEventListener('pointerup', finishPointer);
       canvas.removeEventListener('pointercancel', finishPointer);
       canvas.removeEventListener('pointerleave', onPointerLeave);
+      stage.removeEventListener('wheel', onWheelZoom);
       document.removeEventListener('visibilitychange', onVisibility);
       environment.dispose();
       vesselMesh.geometry.dispose();

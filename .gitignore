@@ -2,8 +2,8 @@ node_modules/
 dist/
 .astro/
 .DS_Store
-.qa-shots
-.qa-shots-3d
+qa-shots/
+qa-shots-3d/
 *.log
 .env
 .env.*

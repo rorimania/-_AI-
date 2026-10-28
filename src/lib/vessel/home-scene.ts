@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { PART_ORDER, PART_RANGES, defaultProfile, type PartId } from './profile';
+import { PART_ORDER, PART_RANGES, defaultProfile, radiusAt, type PartId } from './profile';
 import {
   createBoundaryRingGeometry,
   createPartBandGeometries,
@@ -123,7 +123,7 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.94;
+  renderer.toneMappingExposure = 1.02;
   renderer.shadowMap.enabled = false;
 
   const scene = new THREE.Scene();
@@ -137,10 +137,10 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
   scene.add(vesselGroup);
 
   const vesselMaterial = createGlazeMaterial(renderer, {
-    color: '#9fbdac',
-    roughness: 0.26,
-    clearcoat: 0.8,
-    bumpStrength: 0.002,
+    color: '#a9c4b4',
+    roughness: 0.22,
+    clearcoat: 0.92,
+    bumpStrength: 0.0026,
   });
   const vessel = new THREE.Mesh(createVesselGeometry(defaultProfile, dimensions), vesselMaterial);
   vesselGroup.add(vessel);
@@ -200,6 +200,10 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
   let disposed = false;
   let frameId = 0;
   let lastTime = performance.now();
+  let hoverX = 0;
+  let hoverY = 0;
+  let hoverActive = false;
+  let anchorTick = 0;
 
   const onObserve = (event: Event) => {
     const detail = (event as CustomEvent<{ state?: number }>).detail;
@@ -214,6 +218,23 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
   };
   document.addEventListener('visibilitychange', onVisibility);
 
+  const onPointerMove = (event: PointerEvent) => {
+    if (!stage) return;
+    const rect = stage.getBoundingClientRect();
+    hoverX = ((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2;
+    hoverY = ((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2;
+    hoverActive = true;
+  };
+
+  const onPointerLeave = () => {
+    hoverX = 0;
+    hoverY = 0;
+    hoverActive = false;
+  };
+
+  stage?.addEventListener('pointermove', onPointerMove, { passive: true });
+  stage?.addEventListener('pointerleave', onPointerLeave);
+
   const targetCamera = sampleKeys(-1);
   camera.position.set(CAMERA_X, targetCamera.targetY + CAMERA_Y_OFFSET, targetCamera.distance);
   camera.lookAt(0, targetCamera.targetY, 0);
@@ -225,6 +246,48 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
     renderer.render(scene, camera);
     host.classList.add('is-ready');
     stage?.classList.add('is-3d-ready');
+  };
+
+  const anchorPoint = new THREE.Vector3();
+  const anchorBase = Math.PI * 0.5;
+
+  const emitAnchors = () => {
+    if (!stage) return;
+    if (anchorTick++ % 2 !== 0) return;
+    camera.updateMatrixWorld();
+    vesselGroup.updateMatrixWorld(true);
+
+    const cameraAngle = Math.atan2(
+      camera.position.x - vesselGroup.position.x,
+      camera.position.z - vesselGroup.position.z,
+    );
+    const localBase = cameraAngle - vesselGroup.rotation.y;
+
+    const anchors = PART_ORDER.map((part) => {
+      const range = PART_RANGES[part];
+      const y = (range[0] + range[1]) / 2;
+      const radius = radiusAt(defaultProfile, y) * dimensions.radiusScale * 1.014;
+      const angle = localBase + anchorBase;
+      anchorPoint.set(
+        Math.sin(angle) * radius,
+        (y - 0.5) * dimensions.height,
+        Math.cos(angle) * radius,
+      );
+      vesselGroup.localToWorld(anchorPoint);
+      anchorPoint.project(camera);
+      return {
+        id: part,
+        x: (anchorPoint.x * 0.5 + 0.5) * width,
+        y: (-anchorPoint.y * 0.5 + 0.5) * height,
+        visible: anchorPoint.z < 1,
+      };
+    });
+
+    document.dispatchEvent(
+      new CustomEvent('ciyun:vessel-anchors', {
+        detail: { anchors, width, height },
+      }),
+    );
   };
 
   const renderFrame = (now: number) => {
@@ -245,9 +308,10 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
     const displayState = currentState;
     const key = sampleKeys(displayState);
 
+    const hoverFactor = hoverActive && !reduceMotion ? 1 : 0;
     camera.position.set(
-      CAMERA_X,
-      key.targetY + CAMERA_Y_OFFSET,
+      CAMERA_X + hoverX * 0.075 * hoverFactor,
+      key.targetY + CAMERA_Y_OFFSET - hoverY * 0.04 * hoverFactor,
       key.distance,
     );
     camera.lookAt(0, key.targetY, 0);
@@ -256,7 +320,8 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
     host.dataset.distance = key.distance.toFixed(2);
     host.dataset.targetY = key.targetY.toFixed(2);
 
-    vesselGroup.rotation.y = key.rotate;
+    const ambientTurn = reduceMotion ? 0 : Math.sin(now * 0.00024) * 0.025;
+    vesselGroup.rotation.y = key.rotate + ambientTurn;
     vesselGroup.rotation.z = reduceMotion ? 0 : Math.sin(currentState * 0.9) * 0.012;
 
     const bandState = currentState;
@@ -272,7 +337,7 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
 
     for (let index = 0; index < focusRings.length; index += 1) {
       const ring = focusRings[index];
-      const targetOpacity = 0.5 * focusWeight(bandState, index);
+      const targetOpacity = 0.11 + 0.48 * focusWeight(bandState, index);
       if (reduceMotion) ring.material.opacity = targetOpacity;
       else {
         ring.material.opacity +=
@@ -280,6 +345,7 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
       }
     }
 
+    emitAnchors();
     renderer.render(scene, camera);
   };
 
@@ -311,6 +377,8 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
     intersectionObserver.disconnect();
     document.removeEventListener('ciyun:observe', onObserve);
     document.removeEventListener('visibilitychange', onVisibility);
+    stage?.removeEventListener('pointermove', onPointerMove);
+    stage?.removeEventListener('pointerleave', onPointerLeave);
     environment.dispose();
     disposeScene(scene);
     renderer.dispose();

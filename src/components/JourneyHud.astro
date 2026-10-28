@@ -9,25 +9,6 @@ const { current = '' } = Astro.props;
 ---
 
 <div class="journey-hud" data-journey-hud data-current-stage={current}>
-  <button
-    class="journey-hud__tab"
-    type="button"
-    aria-expanded="false"
-    aria-controls="journey-panel"
-    data-journey-toggle
-  >
-    <span class="journey-hud__seal seal" aria-hidden="true">谱</span>
-    <span class="journey-hud__tab-copy">
-      <span>游器谱</span>
-      <span class="journey-hud__count" data-journey-count>0 / 5</span>
-    </span>
-    <span class="journey-hud__pip" aria-hidden="true"></span>
-  </button>
-
-  <p class="journey-hud__nudge" data-journey-nudge>
-    五关五印，走完会生成一页游器手札
-  </p>
-
   <aside
     class="journey-panel"
     id="journey-panel"
@@ -195,7 +176,9 @@ const { current = '' } = Astro.props;
   }
 
   .journey-panel {
-    position: relative;
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 10px);
     width: min(368px, calc(100vw - 28px));
     max-height: min(76svh, 660px);
     overflow: auto;
@@ -491,4 +474,38 @@ const { current = '' } = Astro.props;
       display: none;
     }
   }
+
+  /* The field-notes drawer is opened from the step rail. */
+  .journey-hud {
+    position: fixed;
+    inset: 0;
+    z-index: 46;
+    display: block;
+    pointer-events: none;
+  }
+
+  .journey-panel {
+    position: absolute;
+    top: calc(var(--nav-h) + var(--rail-h) + 12px);
+    right: clamp(14px, 2.2vw, 30px);
+    bottom: auto;
+    max-height: calc(100svh - var(--nav-h) - var(--rail-h) - 30px);
+    transform-origin: top right;
+    transform: translateY(-8px) scale(0.98);
+  }
+
+  .journey-hud.is-open .journey-panel {
+    transform: translateY(0) scale(1);
+  }
+
+  @media (max-width: 760px) {
+    .journey-panel {
+      top: calc(var(--nav-h) + var(--rail-h) + 8px);
+      right: 12px;
+      left: 12px;
+      width: auto;
+      max-height: calc(100svh - var(--nav-h) - var(--rail-h) - 24px);
+    }
+  }
+
 </style>

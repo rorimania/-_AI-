@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import VesselPoster from '../components/VesselPoster.astro';
 import ProcessIcon from '../components/ProcessIcon.astro';
 import ReferencePlate from '../components/ReferencePlate.astro';
+import GalleryCarousel from '../components/GalleryCarousel.astro';
 import { chapters, hero, steps } from '../data/site';
 import { references } from '../data/references';
 ---
@@ -18,6 +19,30 @@ import { references } from '../data/references';
       <div class="observatory__vessel">
         <VesselPoster label="一只青瓷梅瓶的示意图，瓶身随滚动依次高亮瓶口、瓶颈、瓶肩、瓶腹与圈足" />
         <div class="vessel-canvas" data-vessel-canvas aria-hidden="true"></div>
+        <div class="vessel-annotations" data-vessel-annotations aria-hidden="true">
+          <svg class="vessel-annotations__lines" data-vessel-lines>
+            {chapters.map((chapter) => (
+              <g data-annotation-group={chapter.id}>
+                <path data-annotation-line={chapter.id} fill="none" />
+                <circle data-annotation-dot={chapter.id} r="3" />
+              </g>
+            ))}
+          </svg>
+          <ol class="vessel-annotations__list">
+            {chapters.map((chapter, index) => (
+              <li
+                class="vessel-annotation"
+                data-callout={chapter.id}
+                style={`--callout-top: ${[13, 28, 43, 62, 81][index]}%`}
+              >
+                <span class="vessel-annotation__index latin">{chapter.num}</span>
+                <span class="vessel-annotation__name">{chapter.title}</span>
+                <span class="vessel-annotation__en">{chapter.en}</span>
+                <p class="vessel-annotation__copy">{chapter.copy}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
       <div class="observatory__caption">
         <span class="observatory__caption-cn" data-stage-name>观器</span>
@@ -124,6 +149,8 @@ import { references } from '../data/references';
     </div>
   </section>
 
+  <GalleryCarousel />
+
   <section class="closing" aria-labelledby="closing-title">
     <div class="container closing__inner">
       <div>
@@ -144,6 +171,10 @@ import { references } from '../data/references';
   </section>
 
 </BaseLayout>
+
+<script>
+  import '../scripts/gallery';
+</script>
 
 <style>
   .observatory {
@@ -227,6 +258,158 @@ import { references } from '../data/references';
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  .vessel-annotations {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.9s var(--ease);
+  }
+
+  .observatory__stage.is-annotated .vessel-annotations {
+    opacity: 1;
+  }
+
+  .vessel-annotations__lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .vessel-annotations__lines path {
+    stroke: rgba(79, 111, 99, 0.45);
+    stroke-width: 1;
+    stroke-dasharray: 3 5;
+    opacity: 0.46;
+    transition: opacity var(--dur-2) var(--ease);
+  }
+
+  .vessel-annotations__lines circle {
+    fill: var(--celadon-deep);
+    opacity: 0.48;
+    transition:
+      opacity var(--dur-2) var(--ease),
+      r var(--dur-2) var(--ease);
+  }
+
+  .vessel-annotations__lines [data-annotation-group].is-hidden {
+    display: none;
+  }
+
+  .vessel-annotations__lines [data-annotation-group].is-active path {
+    opacity: 0.92;
+  }
+
+  .vessel-annotations__lines [data-annotation-group].is-active circle {
+    opacity: 1;
+    r: 4;
+  }
+
+  .vessel-annotations__list {
+    position: absolute;
+    inset: 0;
+  }
+
+  .vessel-annotation {
+    position: absolute;
+    top: var(--callout-top);
+    right: 0;
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    grid-template-areas:
+      'idx name'
+      'idx en'
+      'copy copy';
+    align-items: baseline;
+    column-gap: 5px;
+    width: 124px;
+    padding: 5px 0 5px 8px;
+    border-left: 1px solid transparent;
+    font-size: 0.6rem;
+    color: var(--text-soft);
+    text-align: left;
+    transform: translateY(-50%);
+    transition:
+      width var(--dur-3) var(--ease),
+      padding var(--dur-3) var(--ease),
+      background-color var(--dur-3) var(--ease),
+      border-color var(--dur-3) var(--ease),
+      opacity var(--dur-3) var(--ease);
+  }
+
+  .vessel-annotation__index {
+    grid-area: idx;
+    font-size: 0.56rem;
+    letter-spacing: 0.02em;
+    color: var(--text-faint);
+  }
+
+  .vessel-annotation__name {
+    grid-area: name;
+    font-family: var(--font-serif);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .vessel-annotation__en {
+    grid-area: en;
+    font-family: var(--font-latin);
+    font-size: 0.52rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  .vessel-annotation__copy {
+    grid-area: copy;
+    display: none;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--hairline-soft);
+    font-size: 0.64rem;
+    line-height: 1.7;
+    color: var(--text-soft);
+  }
+
+  .observatory__stage.has-active-callout .vessel-annotation:not(.is-active) {
+    opacity: 0.38;
+  }
+
+  .observatory__stage.has-active-callout
+    .vessel-annotations__lines
+    [data-annotation-group]:not(.is-active) {
+    opacity: 0;
+  }
+
+  .vessel-annotation.is-active {
+    z-index: 3;
+    width: 204px;
+    padding: 9px 10px 10px 10px;
+    border-left-color: var(--celadon-deep);
+    background: color-mix(in srgb, var(--paper-light) 88%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 28px rgba(52, 37, 23, 0.08);
+  }
+
+  .vessel-annotation.is-active .vessel-annotation__index {
+    color: var(--celadon-deep);
+  }
+
+  .vessel-annotation.is-active .vessel-annotation__name {
+    font-size: 0.92rem;
+    color: var(--celadon-deep);
+  }
+
+  .vessel-annotation.is-active .vessel-annotation__copy {
+    display: block;
   }
 
   .observatory__caption {
@@ -517,6 +700,27 @@ import { references } from '../data/references';
       display: none;
     }
 
+    .vessel-annotation {
+      display: none;
+    }
+
+    .vessel-annotation.is-active {
+      display: grid;
+      top: auto;
+      right: 2%;
+      bottom: 5%;
+      width: min(208px, 58%);
+      transform: none;
+    }
+
+    .vessel-annotation__copy {
+      display: none;
+    }
+
+    .vessel-annotation.is-active .vessel-annotation__copy {
+      display: block;
+    }
+
     .hero-panel {
       min-height: auto;
       padding-block: clamp(38px, 7vh, 70px) clamp(50px, 8vh, 80px);
@@ -543,6 +747,13 @@ import { references } from '../data/references';
 
     .closing__seal {
       top: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vessel-annotations__lines path,
+    .vessel-annotation {
+      transition: none;
     }
   }
 

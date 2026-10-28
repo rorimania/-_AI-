@@ -16,19 +16,18 @@ function initJourneyHud() {
   const hud = document.querySelector<HTMLElement>('[data-journey-hud]');
   if (!hud) return;
 
-  const toggle = hud.querySelector<HTMLButtonElement>('[data-journey-toggle]');
+  const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-journey-toggle]'));
   const panel = hud.querySelector<HTMLElement>('[data-journey-panel]');
   const close = hud.querySelector<HTMLButtonElement>('[data-journey-close]');
   const reset = hud.querySelector<HTMLButtonElement>('[data-journey-reset]');
   const bar = hud.querySelector<HTMLElement>('[data-journey-bar]');
   const time = hud.querySelector<HTMLElement>('[data-journey-time]');
-  const nudge = hud.querySelector<HTMLElement>('[data-journey-nudge]');
   const current = hud.dataset.currentStage ?? document.body.dataset.page ?? '';
 
-  if (!toggle || !panel) return;
+  if (!toggles.length || !panel) return;
 
   let resetArmed = false;
-  let nudgeTimer = 0;
+  let liveTimer = 0;
 
   const render = (journey: Journey) => {
     const state = completion(journey);
@@ -55,28 +54,37 @@ function initJourneyHud() {
     });
 
     hud.classList.toggle('is-complete', state.complete);
-    if (toggle) {
+    toggles.forEach((toggle) => {
       toggle.setAttribute(
         'aria-label',
         state.count ? `打开游器谱，已落 ${state.count} 枚印` : '打开游器谱，查看五关玩法',
       );
-    }
+      toggle.classList.toggle('has-stamps', state.count > 0);
+    });
+  };
+
+  const tickTime = () => {
+    if (!time) return;
+    const journey = loadJourney();
+    time.textContent = formatDuration(Date.now() - journey.startedAt);
   };
 
   const open = (focus = true) => {
     hud.classList.add('is-open');
-    hud.classList.remove('is-nudging');
-    window.clearTimeout(nudgeTimer);
-    toggle.setAttribute('aria-expanded', 'true');
+    toggles.forEach((toggle) => toggle.setAttribute('aria-expanded', 'true'));
     panel.setAttribute('aria-hidden', 'false');
+    tickTime();
+    window.clearInterval(liveTimer);
+    liveTimer = window.setInterval(tickTime, 1000);
     if (focus) close?.focus({ preventScroll: true });
   };
 
   const closePanel = (focusToggle = false) => {
     hud.classList.remove('is-open');
-    toggle.setAttribute('aria-expanded', 'false');
+    toggles.forEach((toggle) => toggle.setAttribute('aria-expanded', 'false'));
     panel.setAttribute('aria-hidden', 'true');
-    if (focusToggle) toggle.focus({ preventScroll: true });
+    window.clearInterval(liveTimer);
+    if (focusToggle) toggles[0]?.focus({ preventScroll: true });
   };
 
   const onToggle = () => {
@@ -102,7 +110,9 @@ function initJourneyHud() {
 
   const onDocumentClick = (event: MouseEvent) => {
     if (!hud.classList.contains('is-open')) return;
-    if ((event.target as Element | null)?.closest('[data-journey-hud]')) return;
+    const target = event.target as Element | null;
+    if (target?.closest('[data-journey-panel]')) return;
+    if (target?.closest('[data-journey-toggle]')) return;
     closePanel();
   };
 
@@ -115,7 +125,7 @@ function initJourneyHud() {
     if (journey) render(journey);
   };
 
-  toggle.addEventListener('click', onToggle);
+  toggles.forEach((toggle) => toggle.addEventListener('click', onToggle));
   close?.addEventListener('click', onClose);
   reset?.addEventListener('click', onReset);
   document.addEventListener('click', onDocumentClick);
@@ -125,34 +135,14 @@ function initJourneyHud() {
   const journey = loadJourney();
   render(journey);
 
-  if (nudge) {
-    const seen = (() => {
-      try {
-        return window.sessionStorage.getItem('ciyun:journey-nudged') === 'true';
-      } catch {
-        return true;
-      }
-    })();
-
-    if (!seen && completion(journey).count === 0) {
-      hud.classList.add('is-nudging');
-      nudgeTimer = window.setTimeout(() => hud.classList.remove('is-nudging'), 9000);
-      try {
-        window.sessionStorage.setItem('ciyun:journey-nudged', 'true');
-      } catch {
-        // storage is optional
-      }
-    }
-  }
-
   cleanup = () => {
-    toggle.removeEventListener('click', onToggle);
+    toggles.forEach((toggle) => toggle.removeEventListener('click', onToggle));
     close?.removeEventListener('click', onClose);
     reset?.removeEventListener('click', onReset);
     document.removeEventListener('click', onDocumentClick);
     document.removeEventListener('keydown', onKey);
     document.removeEventListener('ciyun:journey', onJourney);
-    window.clearTimeout(nudgeTimer);
+    window.clearInterval(liveTimer);
   };
 }
 
