@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { PART_ORDER, PART_RANGES, defaultProfile, radiusAt, type PartId } from './profile';
 import {
   createBoundaryRingGeometry,
+  createDecorationBandGeometry,
   createPartBandGeometries,
   createVesselGeometry,
   resolveDimensions,
@@ -12,6 +13,7 @@ import {
   createContactShadow,
   createStudioEnvironment,
 } from './environment';
+import { createFloralPatternTexture } from './decoration';
 
 interface CameraKey {
   state: number;
@@ -145,6 +147,30 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
   const vessel = new THREE.Mesh(createVesselGeometry(defaultProfile, dimensions), vesselMaterial);
   vesselGroup.add(vessel);
 
+  const decoration = new THREE.Mesh(
+    createDecorationBandGeometry(defaultProfile, 0.1, 0.81, dimensions),
+    new THREE.MeshPhysicalMaterial({
+      map: createFloralPatternTexture(renderer, isMobile),
+      color: '#ffffff',
+      roughness: 0.26,
+      metalness: 0,
+      clearcoat: 0.8,
+      clearcoatRoughness: 0.1,
+      envMapIntensity: 1,
+      transparent: true,
+      alphaTest: 0.015,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      polygonOffsetUnits: -2,
+    }),
+  );
+  decoration.rotation.y = Math.PI;
+  decoration.scale.set(1.004, 1.001, 1.004);
+  decoration.renderOrder = 0;
+  vesselGroup.add(decoration);
+
   const bandGeometries = createPartBandGeometries(defaultProfile, dimensions);
   const bands = PART_ORDER.map((part: PartId) => {
     const material = createFocusBandMaterial();
@@ -204,6 +230,7 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
   let hoverY = 0;
   let hoverActive = false;
   let anchorTick = 0;
+  let autoSpin = 0;
 
   const onObserve = (event: Event) => {
     const detail = (event as CustomEvent<{ state?: number }>).detail;
@@ -320,9 +347,10 @@ export function mountHomeScene(host: HTMLElement, stage: HTMLElement | null): ()
     host.dataset.distance = key.distance.toFixed(2);
     host.dataset.targetY = key.targetY.toFixed(2);
 
-    const ambientTurn = reduceMotion ? 0 : Math.sin(now * 0.00024) * 0.025;
-    vesselGroup.rotation.y = key.rotate + ambientTurn;
+    if (!reduceMotion) autoSpin += delta * 0.24;
+    vesselGroup.rotation.y = key.rotate + autoSpin;
     vesselGroup.rotation.z = reduceMotion ? 0 : Math.sin(currentState * 0.9) * 0.012;
+    host.dataset.rotation = vesselGroup.rotation.y.toFixed(3);
 
     const bandState = currentState;
     for (let index = 0; index < bands.length; index += 1) {

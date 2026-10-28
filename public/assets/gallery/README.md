@@ -1,16 +1,30 @@
-# 器影长廊图片位
+# 器影长廊图片
 
-把轮播图放在这个目录，建议使用 4:5 竖图（例如 1600 × 2000），主色会和每张卡片的底色叠在一起。
+首页首屏器影长廊已接入 11 张图片。
 
-在 `src/data/gallery.ts` 找到对应器型，把 `image` 从空字符串改为路径即可自动替换占位图，例如：
+每件器物保留两个尺寸：
+
+- `*-card.jpg`：宽 800px，用于轮播卡片；
+- `*-large.jpg`：宽 1600px，用于点击预览。
+
+图片在 `src/data/gallery.ts` 中配置：
 
 ```ts
 {
-  id: 'meiping',
+  id: 'dragon-vase',
+  title: '青花云龙纹瓶',
   // ...
-  image: '/assets/gallery/meiping.jpg',
-  alt: '梅瓶的器影',
+  image: '/assets/gallery/dragon-vase-card.jpg',
+  preview: '/assets/gallery/dragon-vase-large.jpg',
+  alt: '人物与青花云龙纹大瓶',
 }
 ```
 
-替换后，卡片的字号、说明和 3D 翻转过渡都会保留，只需要重新构建页面。
+## 替换或新增
+
+1. 把原图导出为 `800px` 和 `1600px` 两档 JPEG（建议质量 80–84）；
+2. 复制到本目录；
+3. 在 `src/data/gallery.ts` 中填写对应的 `image` 与 `preview`；
+4. 如果要新增器物，直接向 `gallerySlides` 数组追加一项即可，轮播数量会自动更新。
+
+轮播卡片会自动裁切为竖版，点击卡片后的预览会保留完整画面。

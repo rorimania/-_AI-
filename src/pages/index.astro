@@ -13,6 +13,8 @@ import { references } from '../data/references';
   description="一场关于陶瓷的数字交互体验：认识一只瓶的五处骨相，再亲手走完取土、拉坯、择釉、入窑、开窑的五道工序。"
   page="home"
 >
+  <GalleryCarousel />
+
   <section class="observatory" id="observe" aria-labelledby="observe-title">
     <div class="observatory__stage" data-vessel-stage data-mode="home">
       <span class="observatory__index latin" data-stage-index aria-hidden="true">器</span>
@@ -46,9 +48,15 @@ import { references } from '../data/references';
       </div>
       <div class="observatory__caption">
         <span class="observatory__caption-cn" data-stage-name>观器</span>
+        <span class="observatory__spin" aria-hidden="true">
+          <span class="observatory__spin-icon">↻</span>器身自转
+        </span>
         <span class="observatory__caption-en" data-stage-en>Observe the vessel</span>
       </div>
       <span class="observatory__side vertical-text" aria-hidden="true">一器一世界</span>
+      <span class="observatory__spin-mobile" aria-hidden="true">
+        <span class="observatory__spin-icon">↻</span>器身自转
+      </span>
     </div>
 
     <div class="observatory__flow">
@@ -148,8 +156,6 @@ import { references } from '../data/references';
       </div>
     </div>
   </section>
-
-  <GalleryCarousel />
 
   <section class="closing" aria-labelledby="closing-title">
     <div class="container closing__inner">
@@ -441,6 +447,33 @@ import { references } from '../data/references';
     text-transform: uppercase;
   }
 
+  .observatory__spin {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-inline: auto;
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  .observatory__spin-icon {
+    display: inline-block;
+    font-size: 0.86rem;
+    line-height: 1;
+  }
+
+  .observatory__spin-mobile {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .observatory__spin-icon {
+      animation: spin-slow 7s linear infinite;
+    }
+  }
+
   .observatory__side {
     position: absolute;
     top: 15%;
@@ -700,6 +733,20 @@ import { references } from '../data/references';
       display: none;
     }
 
+    .observatory__spin-mobile {
+      position: absolute;
+      bottom: 10px;
+      left: var(--gutter);
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      color: var(--text-faint);
+      white-space: nowrap;
+    }
+
     .vessel-annotation {
       display: none;
     }
@@ -754,6 +801,11 @@ import { references } from '../data/references';
     .vessel-annotations__lines path,
     .vessel-annotation {
       transition: none;
+    }
+
+    .observatory__spin,
+    .observatory__spin-mobile {
+      display: none;
     }
   }
 

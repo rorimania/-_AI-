@@ -5,6 +5,7 @@ import {
   buildBandProfile,
   buildShellProfile,
   radiusAt,
+  sampleBand,
   type PartId,
   type ProfilePoint,
 } from './profile';
@@ -49,6 +50,24 @@ export function createVesselGeometry(
   );
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
+  return geometry;
+}
+
+export function createDecorationBandGeometry(
+  points: ProfilePoint[],
+  y0: number,
+  y1: number,
+  partial: Partial<VesselDimensions> = {},
+): THREE.BufferGeometry {
+  const dimensions = resolveDimensions(partial);
+  const band = sampleBand(points, y0, y1, 120);
+  const geometry = new THREE.LatheGeometry(
+    toVectors(band, dimensions),
+    dimensions.radialSegments,
+    0,
+    Math.PI * 2,
+  );
+  geometry.computeVertexNormals();
   return geometry;
 }
 
