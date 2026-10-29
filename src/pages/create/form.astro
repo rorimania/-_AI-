@@ -135,8 +135,8 @@ const presets = PROFILE_PRESETS.map(({ id, label, note }) => ({ id, name: label,
   .wheel-page {
     display: grid;
     grid-template-columns: minmax(0, 1.58fr) minmax(320px, 0.42fr);
-    height: calc(100svh - var(--nav-h) - var(--rail-h));
-    min-height: 620px;
+    height: var(--create-h);
+    min-height: 0;
   }
 
   .wheel-stage {
@@ -672,6 +672,68 @@ const presets = PROFILE_PRESETS.map(({ id, label, note }) => ({ id, name: label,
     gap: 16px;
     margin-top: auto;
     padding-top: 24px;
+  }
+
+  /* When the panel has to scroll, keep the next-step action above the
+     reference blocks so it is visible without hunting for the scrollbar. */
+  @media (min-width: 861px) and (max-height: 1060px) {
+    .wheel-panel__head {
+      order: 0;
+    }
+
+    .wheel-panel__section {
+      order: 1;
+    }
+
+    .wheel-panel__actions {
+      order: 2;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    .wheel-panel__mini {
+      order: 3;
+    }
+
+    .wheel-panel__status {
+      order: 4;
+    }
+
+    .wheel-panel__seal {
+      order: 5;
+    }
+  }
+
+  @media (min-width: 861px) and (max-height: 820px) {
+    .wheel-panel {
+      gap: 14px;
+      padding: 22px;
+    }
+
+    .wheel-panel__title {
+      margin-top: 10px;
+      font-size: clamp(1.8rem, 2.1vw, 2.2rem);
+    }
+
+    .wheel-panel__lead {
+      margin-top: 10px;
+      line-height: 1.8;
+    }
+  }
+
+  @media (min-width: 861px) and (max-height: 760px) {
+    .wheel-panel {
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .wheel-panel__actions {
+      gap: 10px;
+    }
+
+    .wheel-panel__actions .text-link {
+      display: none;
+    }
   }
 
   @media (max-width: 1080px) {

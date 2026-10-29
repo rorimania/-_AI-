@@ -56,6 +56,9 @@
   /* rhythm */
   --nav-h: 78px;
   --rail-h: 56px;
+  /* Game screens fill the space under the nav + step rail exactly. The extra
+     1px covers the rail's bottom border so the page never scrolls by 1px. */
+  --create-h: calc(100svh - var(--nav-h) - var(--rail-h) - 1px);
   --gutter: clamp(20px, 4.2vw, 64px);
   --page-max: 1440px;
   --section-y: clamp(88px, 13vh, 168px);

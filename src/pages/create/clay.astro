@@ -16,34 +16,36 @@ const materials = [
 >
   <div class="clay-layout">
     <section class="clay-copy">
-      <span class="clay-copy__num" aria-hidden="true">壹</span>
-      <p class="eyebrow">第一道 · 取土 <span class="latin">/ Clay</span></p>
-      <h1 class="clay-copy__title">土有脾气，<br />先揉开它。</h1>
-      <p class="lead clay-copy__lead">
-        高岭土给骨架，瓷石给韧性，水给分寸。三者相遇之后，还要经过一双手。
-      </p>
+      <div class="clay-copy__inner">
+        <span class="clay-copy__num" aria-hidden="true">壹</span>
+        <p class="eyebrow">第一道 · 取土 <span class="latin">/ Clay</span></p>
+        <h1 class="clay-copy__title">土有脾气，<br />先揉开它。</h1>
+        <p class="lead clay-copy__lead">
+          高岭土给骨架，瓷石给韧性，水给分寸。三者相遇之后，还要经过一双手。
+        </p>
 
-      <div class="clay-materials" aria-label="泥料配比示意">
-        {materials.map((material) => (
-          <div class="clay-material">
-            <span class="clay-material__n latin">{material.n}</span>
-            <span class="clay-material__name">{material.name}<span class="clay-material__en">{material.en}</span></span>
-            <span class="clay-material__pct latin">{material.pct}<span>%</span></span>
-            <span class="clay-material__copy">{material.copy}</span>
-          </div>
-        ))}
-      </div>
+        <div class="clay-materials" aria-label="泥料配比示意">
+          {materials.map((material) => (
+            <div class="clay-material">
+              <span class="clay-material__n latin">{material.n}</span>
+              <span class="clay-material__name">{material.name}<span class="clay-material__en">{material.en}</span></span>
+              <span class="clay-material__pct latin">{material.pct}<span>%</span></span>
+              <span class="clay-material__copy">{material.copy}</span>
+            </div>
+          ))}
+        </div>
 
-      <blockquote class="clay-quote">
-        <p>揉泥不是力气活，<br />是听泥的过程。</p>
-        <cite>拉坯前的十分钟</cite>
-      </blockquote>
+        <blockquote class="clay-quote">
+          <p>揉泥不是力气活，<br />是听泥的过程。</p>
+          <cite>拉坯前的十分钟</cite>
+        </blockquote>
 
-      <div class="clay-actions">
-        <a class="btn btn--solid" href="/create/form" data-clay-cta>
-          <span data-clay-cta-label>上轮 · 拉坯</span> <span class="arrow" aria-hidden="true">→</span>
-        </a>
-        <p class="clay-note">揉泥为体验交互，可随时跳过。配比为体验示意，非真实工艺配方。</p>
+        <div class="clay-actions">
+          <a class="btn btn--solid" href="/create/form" data-clay-cta>
+            <span data-clay-cta-label>上轮 · 拉坯</span> <span class="arrow" aria-hidden="true">→</span>
+          </a>
+          <p class="clay-note">揉泥为体验交互，可随时跳过。配比为体验示意，非真实工艺配方。</p>
+        </div>
       </div>
     </section>
 
@@ -109,15 +111,24 @@ const materials = [
     margin-inline: auto;
     padding-inline: var(--gutter);
     align-items: stretch;
-    min-height: calc(100svh - var(--nav-h) - var(--rail-h));
+    height: var(--create-h);
+    min-height: 0;
   }
 
   .clay-copy {
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
     padding-block: clamp(36px, 5.5vh, 70px);
+  }
+
+  .clay-copy__inner {
+    width: 100%;
+    margin-block: auto;
   }
 
   .clay-copy__num {
@@ -242,6 +253,7 @@ const materials = [
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 0;
     padding-block: clamp(20px, 3.5vh, 44px);
   }
 
@@ -250,6 +262,8 @@ const materials = [
     flex-direction: column;
     width: 100%;
     max-width: 580px;
+    max-height: 100%;
+    min-height: 0;
     border: 1px solid var(--hairline);
     background:
       radial-gradient(circle at 50% 38%, rgba(250, 246, 238, 0.92) 0%, rgba(233, 225, 211, 0.62) 58%, rgba(228, 218, 201, 0.5) 100%);
@@ -386,6 +400,9 @@ const materials = [
   .clay-stage__canvas-wrap {
     position: relative;
     aspect-ratio: 1 / 0.8;
+    flex: 1 1 auto;
+    min-height: 0;
+    container-type: size;
     display: grid;
     place-items: center;
     overflow: hidden;
@@ -419,7 +436,7 @@ const materials = [
 
   .clay-stage__ring {
     position: absolute;
-    width: 76%;
+    width: min(76cqw, 92cqh);
     aspect-ratio: 1;
     border: 1px solid var(--hairline-soft);
     border-radius: 50%;
@@ -527,14 +544,115 @@ const materials = [
     color: var(--celadon-deep);
   }
 
+  /* Shorter desktops: tighten the vertical rhythm so the copy still fits
+     beside the stage instead of pushing the page past the viewport. */
+  @media (min-width: 981px) and (max-height: 1180px) {
+    .clay-copy {
+      padding-block: clamp(24px, 4vh, 44px);
+    }
+
+    .clay-copy__title {
+      margin-top: 18px;
+      font-size: clamp(2.3rem, 3.8vw, 4rem);
+    }
+
+    .clay-copy__lead {
+      margin-top: 20px;
+    }
+
+    .clay-materials {
+      margin-top: clamp(28px, 4vh, 40px);
+    }
+
+    .clay-material {
+      padding-block: 11px;
+    }
+
+    .clay-quote {
+      margin-top: clamp(28px, 4vh, 42px);
+    }
+
+    .clay-quote p {
+      font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+    }
+
+    .clay-actions {
+      margin-top: clamp(30px, 4.5vh, 44px);
+    }
+  }
+
+  @media (min-width: 981px) and (max-height: 1000px) {
+    .clay-copy {
+      padding-block: clamp(18px, 3vh, 30px);
+    }
+
+    .clay-copy__title {
+      margin-top: 14px;
+      font-size: clamp(2.1rem, 3.4vw, 3.4rem);
+    }
+
+    .clay-copy__lead {
+      margin-top: 14px;
+      line-height: 1.8;
+    }
+
+    .clay-materials {
+      margin-top: 22px;
+    }
+
+    .clay-material {
+      padding-block: 8px;
+    }
+
+    .clay-material__copy {
+      line-height: 1.6;
+    }
+
+    .clay-quote {
+      margin-top: 22px;
+    }
+
+    .clay-quote p {
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .clay-quote cite {
+      margin-top: 6px;
+    }
+
+    .clay-actions {
+      margin-top: 24px;
+      gap: 14px 20px;
+    }
+  }
+
+  /* Very short laptop screens: drop the decorative quote so the copy and the
+     "上轮" action stay fully visible without internal scrolling. */
+  @media (min-width: 981px) and (max-height: 840px) {
+    .clay-quote {
+      display: none;
+    }
+
+    .clay-material {
+      padding-block: 6px;
+    }
+
+    .clay-actions {
+      margin-top: 20px;
+    }
+  }
+
   @media (max-width: 980px) {
     .clay-layout {
       grid-template-columns: minmax(0, 1fr);
       gap: 8px;
+      height: auto;
       min-height: 0;
     }
 
     .clay-copy {
+      overflow: visible;
       padding-block: clamp(40px, 7vh, 72px) 22px;
     }
 
