@@ -219,11 +219,11 @@ function lotusBand(ctx: Ctx, width: number, height: number) {
     ctx.restore();
   }
 
-  border(ctx, width, height, base + 18, 1);
+  border(ctx, width, base + 18, 1);
   ctx.restore();
 }
 
-function border(ctx: Ctx, width: number, height: number, y: number, flip: number) {
+function border(ctx: Ctx, width: number, y: number, flip: number) {
   ctx.save();
   ctx.strokeStyle = 'rgba(57, 88, 70, 0.55)';
   ctx.lineWidth = 1.4;
@@ -265,7 +265,7 @@ export function createFloralPatternTexture(renderer: THREE.WebGLRenderer, mobile
   ctx.lineJoin = 'round';
 
   // Fine framing rings read as carved borders at shoulder and foot.
-  border(ctx, width, height, height * 0.08, -1);
+  border(ctx, width, height * 0.08, -1);
   lotusBand(ctx, width, height);
 
   vine(ctx, width, height);

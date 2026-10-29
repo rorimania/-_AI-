@@ -24,6 +24,13 @@
 - 许可：CC0 1.0
 - 用途：Three.js PMREM 环境光照与釉面反射；加载失败时回退为程序化环境光。
 
+## 器影长廊图片
+
+- 文件：`public/assets/gallery/*-card.jpg`、`public/assets/gallery/*-large.jpg`
+- 用途：首页首屏「器影长廊」轮播卡片与点击预览
+- 来源：由项目组提供的展示素材，不作为馆藏文物图像使用。
+- 备注：如需公开再发布这些图片，请先确认图片授权，并在此补充摄影、生成或版权信息。
+
 ## 字体（SIL OFL 1.1）
 
 - Noto Serif SC Variable（Google / Adobe），通过 `@fontsource-variable/noto-serif-sc` 自托管。

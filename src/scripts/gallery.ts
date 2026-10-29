@@ -29,17 +29,9 @@ function initGallery() {
   const count = cards.length;
   const half = Math.floor(count / 2);
   let active = 0;
-  let dragging = false;
-  let dragStartX = 0;
-  let dragStartY = 0;
-  let dragDelta = 0;
-  let suppressClick = false;
   let autoTimer = 0;
   let paused = false;
   let inView = false;
-  let hoverX = 0;
-  let hoverAccum = 0;
-  let hoverCooldown = 0;
   let wheelCooldown = 0;
 
   const offsetFor = (index: number, anchor: number) => {
@@ -92,7 +84,7 @@ function initGallery() {
 
   const restartAuto = () => {
     window.clearInterval(autoTimer);
-    if (reduceMotion || paused || !inView) return;
+    if (reduceMotion || paused || !inView || preview?.open) return;
     autoTimer = window.setInterval(() => setActive(active + 1), 10000);
   };
 
@@ -148,84 +140,23 @@ function initGallery() {
   };
 
   const onCard = (event: Event) => {
-    if (suppressClick) return;
     const card = event.currentTarget as HTMLButtonElement;
     const index = Number(card.dataset.galleryIndex);
     if (!Number.isFinite(index)) return;
     openPreview(index);
   };
 
-  const onStageEnter = (event: PointerEvent) => {
-    if (event.pointerType === 'mouse') hoverX = event.clientX;
-    hoverAccum = 0;
-  };
-
-  const onHoverMove = (event: PointerEvent) => {
-    if (event.pointerType !== 'mouse' || event.buttons !== 0 || dragging || preview?.open) return;
-    const dx = event.clientX - hoverX;
-    hoverX = event.clientX;
-
-    if (Math.abs(dx) > 40) {
-      hoverAccum = 0;
-      return;
-    }
-    if (Math.sign(dx) !== Math.sign(hoverAccum)) hoverAccum = 0;
-    hoverAccum += dx;
-
-    if (Math.abs(hoverAccum) < 120) return;
-    if (performance.now() < hoverCooldown) return;
-
-    go(hoverAccum > 0 ? -1 : 1);
-    hoverAccum = 0;
-    hoverCooldown = performance.now() + 520;
-  };
-
-  const onStageLeave = () => {
-    hoverX = 0;
-    hoverAccum = 0;
-  };
-
   const onWheel = (event: WheelEvent) => {
     if (preview?.open) return;
-    if (Math.abs(event.deltaX) <= Math.abs(event.deltaY) * 1.2) return;
-    if (Math.abs(event.deltaX) < 4) return;
+    const delta =
+      Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+    if (Math.abs(delta) < 4) return;
+
+    // The carousel owns the wheel while the pointer is over the vessel stage.
     event.preventDefault();
     if (performance.now() < wheelCooldown) return;
-    go(event.deltaX > 0 ? 1 : -1);
-    wheelCooldown = performance.now() + 500;
-  };
-
-  const onPointerDown = (event: PointerEvent) => {
-    if (event.button !== 0 && event.pointerType === 'mouse') return;
-    dragging = true;
-    suppressClick = false;
-    dragStartX = event.clientX;
-    dragStartY = event.clientY;
-    dragDelta = 0;
-  };
-
-  const onPointerMove = (event: PointerEvent) => {
-    if (!dragging) return;
-    const dx = event.clientX - dragStartX;
-    const dy = event.clientY - dragStartY;
-    if (Math.abs(dx) < 8) return;
-    if (Math.abs(dx) > Math.abs(dy)) {
-      dragDelta = dx;
-      event.preventDefault();
-    }
-  };
-
-  const finishDrag = () => {
-    if (!dragging) return;
-    dragging = false;
-    if (Math.abs(dragDelta) > 42) {
-      suppressClick = true;
-      go(dragDelta > 0 ? -1 : 1);
-      window.setTimeout(() => {
-        suppressClick = false;
-      }, 0);
-    }
-    dragDelta = 0;
+    go(delta > 0 ? 1 : -1);
+    wheelCooldown = performance.now() + 560;
   };
 
   const onKey = (event: KeyboardEvent) => {
@@ -270,14 +201,7 @@ function initGallery() {
   next?.addEventListener('click', onNext);
   dots.forEach((dot) => dot.addEventListener('click', onDot));
   cards.forEach((card) => card.addEventListener('click', onCard));
-  stage.addEventListener('pointerdown', onPointerDown);
-  stage.addEventListener('pointermove', onPointerMove);
-  stage.addEventListener('pointermove', onHoverMove);
-  stage.addEventListener('pointerenter', onStageEnter);
-  stage.addEventListener('pointerleave', onStageLeave);
-  stage.addEventListener('pointerup', finishDrag);
-  stage.addEventListener('pointercancel', finishDrag);
-  root.addEventListener('wheel', onWheel, { passive: false });
+  stage.addEventListener('wheel', onWheel, { passive: false });
   root.addEventListener('keydown', onKey);
   root.addEventListener('pointerenter', pause);
   root.addEventListener('pointerleave', resume);
@@ -309,14 +233,7 @@ function initGallery() {
     next?.removeEventListener('click', onNext);
     dots.forEach((dot) => dot.removeEventListener('click', onDot));
     cards.forEach((card) => card.removeEventListener('click', onCard));
-    stage.removeEventListener('pointerdown', onPointerDown);
-    stage.removeEventListener('pointermove', onPointerMove);
-    stage.removeEventListener('pointermove', onHoverMove);
-    stage.removeEventListener('pointerenter', onStageEnter);
-    stage.removeEventListener('pointerleave', onStageLeave);
-    stage.removeEventListener('pointerup', finishDrag);
-    stage.removeEventListener('pointercancel', finishDrag);
-    root.removeEventListener('wheel', onWheel);
+    stage.removeEventListener('wheel', onWheel);
     root.removeEventListener('keydown', onKey);
     root.removeEventListener('pointerenter', pause);
     root.removeEventListener('pointerleave', resume);

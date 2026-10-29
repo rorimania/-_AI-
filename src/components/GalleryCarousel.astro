@@ -19,7 +19,7 @@ const initialOffset = (index: number) =>
       </div>
       <div class="gallery-head__aside">
         <p class="gallery-head__note reveal" style="--delay: 140ms">
-          左右移动鼠标换一只，点击卡片放大预览。也可以用方向键或拖动来切换。
+          把鼠标移到器影上，使用滚轮换一只；点击卡片可放大预览。
         </p>
         <div class="gallery-head__actions reveal" style="--delay: 180ms">
           <a class="btn btn--solid" href="/create/clay">
@@ -117,7 +117,7 @@ const initialOffset = (index: number) =>
       </div>
 
 
-      <p class="gallery-hint">左右移动鼠标换一只 · 点击卡片预览</p>
+      <p class="gallery-hint">鼠标悬停器影 · 滚轮换一只 · 点击卡片预览</p>
     </div>
   </div>
 
@@ -210,12 +210,8 @@ const initialOffset = (index: number) =>
     perspective-origin: 50% 38%;
     transform-style: preserve-3d;
     touch-action: pan-y;
-    cursor: grab;
+    cursor: default;
     user-select: none;
-  }
-
-  .gallery-carousel__stage:active {
-    cursor: grabbing;
   }
 
   .gallery-carousel__axis {
