@@ -148,11 +148,14 @@ function initGallery() {
 
   const onWheel = (event: WheelEvent) => {
     if (preview?.open) return;
+    const target = event.target;
+    // Only the cards take over the wheel; hovering the empty stage keeps the
+    // page scrollable, otherwise the large stage traps the whole viewport.
+    if (!(target instanceof Element) || !target.closest('[data-gallery-card]')) return;
     const delta =
       Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
     if (Math.abs(delta) < 4) return;
 
-    // The carousel owns the wheel while the pointer is over the vessel stage.
     event.preventDefault();
     if (performance.now() < wheelCooldown) return;
     go(delta > 0 ? 1 : -1);
