@@ -4,15 +4,17 @@ import { navLinks, steps } from '../data/site';
 const path = Astro.url.pathname;
 const isHome = path === '/' || path === '/index.html';
 const isCreate = path.startsWith('/create');
+const isCiku = path.startsWith('/ciku');
 
 const activeFor = (match: string) => {
   if (match === 'home') return isHome;
   if (match === 'create') return isCreate;
+  if (match === 'ciku') return isCiku;
   return false;
 };
 
 const menuGroups = [
-  { label: '行旅', links: [{ label: '识器', sub: 'INDEX', href: '/' }, { label: '工序', sub: 'PROCESS', href: '/#process' }, { label: '馆藏', sub: 'COLLECTION', href: '/#collection' }, { label: '器影', sub: 'GALLERY', href: '/#gallery' }] },
+  { label: '行旅', links: [{ label: '识器', sub: 'INDEX', href: '/' }, { label: '工序', sub: 'PROCESS', href: '/#process' }, { label: '瓷库', sub: 'ARCHIVE', href: '/ciku' }, { label: '器影', sub: 'GALLERY', href: '/#gallery' }] },
   { label: '制器', links: steps.map((step) => ({ label: step.name, sub: `0${step.n}`, href: step.href })) },
   { label: '更多', links: [{ label: '素材鸣谢', sub: 'CREDITS', href: '/credits' }] },
 ];

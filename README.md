@@ -118,13 +118,14 @@ pnpm check
 
 | 路由 | 页面 | 主要内容 |
 | --- | --- | --- |
-| `/` | 识器 | 首屏器影长廊、3D 观器、器物部件标注、五道工序、馆藏四色 |
+| `/` | 识器 | 首屏器影长廊、3D 观器、器物部件标注、五道工序、釉色参照 |
+| `/ciku` | 瓷库 | 十类器物档案、分类索引、98 件藏品与 148 幅图像、详情弹窗 |
 | `/create/clay` | 取土 | 揉泥三巡小游戏、泥料配比 |
 | `/create/form` | 拉坯 | 3D 轮盘塑形、器型预设、修坯与撤销 |
 | `/create/craft` | 择釉 | 试釉三问、四种釉色、馆藏参照 |
 | `/create/fire` | 入窑 | 候火三刻、烧成阶段、窑温反馈 |
 | `/create/result` | 开窑 | 成品陈列、器物档案、游器手札、回忆卡下载 |
-| `/credits` | 素材鸣谢 | 馆藏图像与 HDRI 来源 |
+| `/credits` | 素材鸣谢 | 馆藏图像、瓷库来源与 HDRI 来源 |
 
 ---
 
@@ -138,10 +139,10 @@ pnpm check
 | 交互脚本 | TypeScript + 原生 DOM / Canvas |
 | 字体 | Noto Serif SC Variable、EB Garamond Variable（Fontsource） |
 | 状态存储 | `localStorage` |
-| 视觉资产 | The Met CC0 馆藏图像、Poly Haven CC0 HDRI |
+| 视觉资产 | The Met CC0 馆藏图像、故宫博物院数字文物库藏品图像、Poly Haven CC0 HDRI |
 | 浏览器 QA | Playwright Core + 本机 Chrome |
 
-项目采用 Astro 的静态输出与按需加载策略：Three.js 只在需要 3D 的页面动态载入，攻略页、馆藏页等保持轻量。
+项目采用 Astro 的静态输出与按需加载策略：Three.js 只在需要 3D 的页面动态载入，瓷库、素材鸣谢等纯内容页保持轻量。
 
 ---
 
@@ -160,6 +161,7 @@ pnpm check
 │  │  ├─ site.ts                  # 首页文案、工序、章节、导航
 │  │  ├─ crafts.ts                # 四种釉色数据
 │  │  ├─ gallery.ts               # 十一张器影与预览文案
+│  │  ├─ ciku.ts                  # 瓷库十类、98 件器物与 148 幅图像
 │  │  ├─ references.ts            # 馆藏图像数据
 │  │  └─ tones.ts                 # 釉色调色板
 │  ├─ layouts/
@@ -178,6 +180,7 @@ pnpm check
 │  │     └─ wheel-scene.ts        # 拉坯轮盘 3D
 │  ├─ pages/
 │  │  ├─ index.astro
+│  │  ├─ ciku.astro
 │  │  ├─ create/
 │  │  │  ├─ clay.astro
 │  │  │  ├─ form.astro
@@ -190,7 +193,8 @@ pnpm check
 ├─ public/
 │  └─ assets/
 │     ├─ hdri/                    # 本地工作室 HDRI
-│     └─ gallery/                 # 器影卡片图与预览大图
+│     ├─ gallery/                 # 器影卡片图与预览大图
+│     └─ ciku/                    # 瓷库十类藏品图像（dpm-*.jpg）
 ├─ scripts/                       # QA 截图与交互脚本
 ├─ 设计文档.md
 ├─ CREDITS.md
@@ -230,6 +234,18 @@ pnpm check
 轮播卡片会自动裁切为竖版，预览弹窗保留完整图片。
 
 目录中的 `public/assets/gallery/README.md` 也记录了同样说明。
+
+### 瓷库数据
+
+瓷库页面（`/ciku`）的数据集中在 `src/data/ciku.ts`，按“胎与釉的先后”排列十类：红陶、灰陶、白陶、黑陶、彩陶、彩绘陶、釉陶、原始瓷、釉下彩、颜色釉。
+
+- 每类包含分类导语、年代范围、封面与 `items`；
+- 每件器物记录标题、年代、尺寸、说明、图像数组与故宫博物院藏品页链接；
+- 图像位于 `public/assets/ciku/<类别>/dpm-<藏品编号>-<序号>.jpg`，文件名保留藏品编号，便于回溯来源；
+- 每张原图旁另有 `-card.jpg` 的 480px 版本，用于网格卡片与详情缩略图；详情主图仍加载原图；
+- 无图器物保留在数据中，页面以“暂无图像”的档案卡占位，详情弹窗仍展示文字。
+
+说明文字与图像来自故宫博物院数字文物库，版权归故宫博物院所有；补充或替换来源时，请同步更新 `CREDITS.md` 与 `/credits` 页面。`其他` 文件夹中的两件青釉狗圈既无图像也不属于独立器类，未收入瓷库。
 
 ### 文案与工序
 
@@ -318,7 +334,7 @@ pnpm check   # TypeScript / Astro 检查
 pnpm build   # 生产构建
 ```
 
-当前检查结果为 **0 errors**，`pnpm build` 可成功生成 7 个静态页面。
+当前检查结果为 **0 errors**，`pnpm build` 可成功生成 8 个静态页面。
 
 仓库中的 `scripts/qa-*.mjs` 提供 Playwright 截图与交互检查脚本，运行时需要：
 
@@ -336,6 +352,7 @@ pnpm build   # 生产构建
 - [x] 游器手札生成与图片下载
 - [x] 伪 3D 器影轮播
 - [x] 器影长廊接入 11 张器物图片
+- [x] 瓷库页面：十类 98 件器物档案与详情弹窗
 - [ ] 为器影图片补充馆藏 / 摄影来源说明
 - [ ] 将自定义拉坯轮廓持久化并用于开窑成品
 - [ ] 文物数据与 AI 实验室扩展
@@ -348,6 +365,7 @@ pnpm build   # 生产构建
 ## 素材与版权
 
 - 馆藏图像：The Metropolitan Museum of Art Open Access，CC0。
+- 瓷库图像与文字：故宫博物院数字文物库，版权归故宫博物院所有，仅用于本次赛事展示。
 - 工作室 HDRI：Poly Haven，CC0。
 - 字体：Noto Serif SC、EB Garamond，通过 Fontsource 使用。
 - 器影长廊照片：由项目组提供，仅用于本次参赛展示。

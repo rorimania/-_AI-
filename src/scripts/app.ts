@@ -85,11 +85,14 @@ function updateActiveNav() {
   const path = location.pathname;
   const isHome = path === '/' || path === '/index.html';
   const isCreate = path.startsWith('/create');
+  const isCiku = path.startsWith('/ciku');
 
   document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]').forEach((link) => {
     const match = link.dataset.navLink;
     const active =
-      (match === 'home' && isHome) || (match === 'create' && isCreate);
+      (match === 'home' && isHome) ||
+      (match === 'create' && isCreate) ||
+      (match === 'ciku' && isCiku);
     if (active) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });

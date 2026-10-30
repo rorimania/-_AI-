@@ -143,7 +143,7 @@ import { references } from '../data/references';
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">馆藏四色 · Collection</p>
+          <p class="eyebrow reveal">釉色参照 · References</p>
           <h2 class="h2 reveal" id="collection-title" style="--delay: 80ms">四种釉色，<br />四件参照。</h2>
         </div>
         <p class="section-head__note reveal" style="--delay: 140ms">
@@ -153,6 +153,11 @@ import { references } from '../data/references';
 
       <div class="ref-grid">
         {references.map((reference) => <ReferencePlate reference={reference} />)}
+      </div>
+
+      <div class="collection-more reveal">
+        <p class="collection-more__note">四种釉色只是入口。瓷库按胎与釉的先后，收录十类九十八件器物。</p>
+        <a class="text-link" href="/ciku">进入瓷库 · 十类器物 <span class="arrow" aria-hidden="true">→</span></a>
       </div>
     </div>
   </section>
@@ -648,6 +653,24 @@ import { references } from '../data/references';
 
   .collection-section {
     border-top: 1px solid var(--hairline);
+  }
+
+  .collection-more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 18px 40px;
+    margin-top: clamp(30px, 4vw, 50px);
+    padding-top: 20px;
+    border-top: 1px solid var(--hairline-soft);
+  }
+
+  .collection-more__note {
+    max-width: 42ch;
+    color: var(--text-soft);
+    font-size: var(--text-sm);
+    line-height: 1.9;
   }
 
   .closing {
